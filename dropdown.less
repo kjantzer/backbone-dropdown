@@ -1,0 +1,378 @@
+/*
+	Dropdown - dropdown view for Backbone
+*/
+
+@dropdown-arrow-offset: 7px;
+@dropdown-max-height: 400px;
+
+div.dropdown {
+	cursor: default;
+	position: absolute;
+	z-index: 10;
+	top: 0;
+	left: 0;
+	background: #fff;
+	border: solid 1px #bbb;
+	.box-shadow(#999 0 1px 3px);
+	width: 200px;
+	display: none;
+	min-height: 20px;
+	max-height: @dropdown-max-height;
+	
+	font-size: 12px;
+	line-height: 1.3em;
+	font-weight: normal;
+	text-shadow: rgba(255,255,255,.5) 0 1px 0;
+	color: #444;
+	
+	
+	&.open { display: block; }
+	
+	
+	// ALIGN BOTTOM ------------------------------------------------------------------------
+	&.align-bottom,
+	&.align-bottomLeft,
+	&.align-bottomRight {
+		top: 100%;
+		margin-top: 10px;
+	}
+	
+	&.align-bottomRight { left: -1px; right: auto; }
+	&.align-bottomLeft { right: -1px; left: auto; }
+	
+	
+	// ARROWS
+	&.align-bottom:before,
+	&.align-bottom:after,
+	&.align-bottomLeft:before,
+	&.align-bottomLeft:after,
+	&.align-bottomRight:before,
+	&.align-bottomRight:after {
+		content: '';
+		position: absolute;
+		top: -7px;
+		left: @dropdown-arrow-offset;
+		width: 0; 
+		height: 0; 
+		border-left: 8px solid transparent;
+		border-right: 8px solid transparent;
+		
+		border-bottom: 8px solid #fff;
+	}
+		// arrow border
+		&.align-bottom:before,
+		&.align-bottomRight:before,
+		&.align-bottomLeft:before {
+			border-bottom-color: #999;
+			top: -8px;
+		}
+	
+	&.align-bottom:before,
+	&.align-bottom:after {
+		left: 50%;
+		margin-left: -8px;
+	}
+	
+	&.align-bottomLeft:before,
+	&.align-bottomLeft:after {
+		left: auto;
+		right: @dropdown-arrow-offset;
+	}
+	
+	&.align-bottomRight.style-toolbar:after,
+	&.align-bottomLeft.style-toolbar:after {
+		border-bottom-color: #eee;
+	}
+	
+	
+	// ALIGN BOTTOM ------------------------------------------------------------------------
+	&.align-top,
+	&.align-topLeft,
+	&.align-topRight {
+		top: auto;
+		bottom: 100%;
+		margin-bottom: 10px;
+	}
+	
+	&.align-topRight { left: -1px; right: auto; }
+	&.align-topLeft { right: -1px; left: auto; }
+	
+	
+	// ARROWS
+	&.align-top:before,
+	&.align-top:after,
+	&.align-topLeft:before,
+	&.align-topLeft:after,
+	&.align-topRight:before,
+	&.align-topRight:after {
+		content: '';
+		position: absolute;
+		bottom: -7px;
+		left: @dropdown-arrow-offset;
+		width: 0; 
+		height: 0; 
+		border-left: 8px solid transparent;
+		border-right: 8px solid transparent;
+		
+		border-top: 8px solid #fff;
+	}
+		// arrow border
+		&.align-top:before,
+		&.align-topRight:before,
+		&.align-topLeft:before {
+			border-top-color: #999;
+			bottom: -8px;
+		}
+	
+	&.align-top:before,
+	&.align-top:after {
+		left: 50%;
+		margin-left: -8px;
+	}
+	
+	&.align-topLeft:before,
+	&.align-topLeft:after {
+		left: auto;
+		right: @dropdown-arrow-offset;
+	}
+	
+	&.align-topRight.style-toolbar:after,
+	&.align-topLeft.style-toolbar:after {
+		border-top-color: #eee;
+	}
+	
+	
+	
+	// ALIGN LEFT ------------------------------------------------------------------------
+	&.align-left,
+	&.align-leftTop,
+	&.align-leftBottom {
+		left: auto;
+		right: 100%;
+		margin-right: 10px;
+		top: -1px;
+	}
+	
+	&.align-leftTop { bottom: -1px; top: auto}
+	&.align-leftBottom { bottom: auto; top: -1px}
+	
+	
+	// ARROWS
+	&.align-left:before,
+	&.align-left:after,
+	&.align-leftTop:before,
+	&.align-leftTop:after,
+	&.align-leftBottom:before,
+	&.align-leftBottom:after {
+		content: '';
+		position: absolute;
+		right: -7px;
+		top: @dropdown-arrow-offset;
+		width: 0; 
+		height: 0; 
+		border-top: 8px solid transparent;
+		border-bottom: 8px solid transparent;
+		
+		border-left: 8px solid #fff;
+	}
+		// arrow border
+		&.align-left:before,
+		&.align-leftTop:before,
+		&.align-leftBottom:before {
+			border-left-color: #999;
+			right: -8px;
+		}
+	
+	// adjust arrow for LEFT
+	&.align-left:before,
+	&.align-left:after {
+		top: 50%;
+		margin-top: -8px;
+	}
+	
+	&.align-leftTop:before,
+	&.align-leftTop:after {
+		top: auto;
+		bottom: @dropdown-arrow-offset;
+	}
+	
+	&.align-left.style-toolbar:after,
+	&.align-leftTop.style-toolbar:after,
+	&.align-leftBottom.style-toolbar:after {
+		border-left-color: #e4e4e4;
+	}
+	
+	
+	// ALIGN RIGHT ------------------------------------------------------------------------
+	&.align-right,
+	&.align-rightTop,
+	&.align-rightBottom {
+		right: auto;
+		left: 100%;
+		margin-left: 10px;
+		top: -1px;
+	}
+	
+	&.align-rightTop { bottom: -1px; top: auto}
+	&.align-rightBottom { bottom: auto; top: -1px}
+	
+	// ARROWS
+	&.align-right:before,
+	&.align-right:after,
+	&.align-rightTop:before,
+	&.align-rightTop:after,
+	&.align-rightBottom:before,
+	&.align-rightBottom:after {
+		content: '';
+		position: absolute;
+		left: -7px;
+		top: @dropdown-arrow-offset;
+		width: 0; 
+		height: 0; 
+		border-top: 8px solid transparent;
+		border-bottom: 8px solid transparent;
+		
+		border-right: 8px solid #fff;
+	}
+		// arrow border
+		&.align-right:before,
+		&.align-rightTop:before,
+		&.align-rightBottom:before {
+			border-right-color: #999;
+			left: -8px;
+		}
+	
+	// adjust arrow for LEFT
+	&.align-right:before,
+	&.align-right:after {
+		top: 50%;
+		margin-top: -8px;
+	}
+	
+	&.align-rightTop:before,
+	&.align-rightTop:after {
+		top: auto;
+		bottom: @dropdown-arrow-offset;
+	}
+	
+	&.align-right.style-toolbar:after,
+	&.align-rightBottom.style-toolbar:after {
+		border-right-color: #e4e4e4;
+	}
+	
+	
+	
+/*
+	Default Dropdown View
+*/
+	.dropdown-text-view {
+		padding: 7px;
+		
+		> p {
+			line-height: 1.2em;
+			margin-bottom: 1em;
+		}
+		
+		> *:last-child {
+			margin-bottom: 0;
+		}
+	}
+	
+	
+/*
+	Default Dropdown View
+*/
+	.dropdown-menu-view {
+		padding: 1px;
+		
+		> li {
+			padding: 7px;
+			cursor: pointer;
+			
+			&:hover {
+				.blue-hover-state();
+			}
+			
+			// icon
+			&:after {
+				vertical-align: top;
+				font-size: .9em;
+			}
+		}
+	}
+	
+	
+
+/*
+	Search Bar
+*/
+	.search-bar {
+		.gradient(#ddd,#ddd,#eee);
+		padding: 2px 5px;
+		border-bottom: solid 1px #bbb;
+		.box-shadow(#fff 0 1px 0 inset);
+		height: 31px;
+		
+		input {
+			width: 100%;
+		}
+	
+	}
+ 
+ 
+/*
+	Search Results
+*/
+	.search-results {
+		max-height: @dropdown-max-height;
+		overflow-y: scroll;
+	
+		> li {
+			padding: 10px 5px;
+		
+			&.active{
+				.gradient(#4da0f7, #3671c0, #4da0f7);
+				color: #fff;
+				text-shadow: rgba(0,0,0,.5) 0 1px 0;
+			}
+		}
+	}
+	
+	.search-bar + .search-results {
+		max-height: @dropdown-max-height - 36; // 36 is height of search-bar
+	}
+	
+	
+}
+
+
+
+
+// !TEMP - move to better location
+.search-results{
+	
+	.book-search-result {
+	
+		p {
+			color: inherit !important;
+			font-size: 1em !important;
+			margin: 0 !important;
+		}
+	
+		.id {
+			font-weight: bold;
+			display: inline-block;
+			width: 35px;
+		}
+		
+		.edition {
+			padding-left: 35px;
+			font-size: .8em !important;
+			line-height: 0;
+			opacity: .6;
+			padding-top: 4px;
+			text-transform: lowercase;
+		}
+	}
+	
+}
