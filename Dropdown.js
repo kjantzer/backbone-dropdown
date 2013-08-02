@@ -88,7 +88,7 @@ var Dropdown = Backbone.View.extend({
 		// listen for the view telling us to close
 		this.view.on('dropdown:close', this.close, this);
 		
-		if( this.options.trigger === 'init' || this.options.openOnInit )
+		if( this.options.trigger === 'none' || this.options.openOnInit )
 			_.defer(this.open.bind(this));
 		
 	},
