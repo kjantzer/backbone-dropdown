@@ -1,8 +1,10 @@
 /*
 	Dropdown - dropdown view for Backbone
+	
+	note: requires elements.less
 */
 
-@dropdown-arrow-offset: 7px;
+@dropdown-arrow-offset: 5px;
 @dropdown-max-height: 400px;
 
 div.dropdown {
@@ -15,7 +17,7 @@ div.dropdown {
 	border: solid 1px #bbb;
 	.box-shadow(#999 0 1px 3px);
 	width: 200px;
-	display: none;
+	display: none !important;
 	min-height: 20px;
 	max-height: @dropdown-max-height;
 	
@@ -23,10 +25,12 @@ div.dropdown {
 	line-height: 1.3em;
 	font-weight: normal;
 	text-shadow: rgba(255,255,255,.5) 0 1px 0;
+	text-align: left;
 	color: #444;
+	text-transform: none;
 	
 	
-	&.open { display: block; }
+	&.open { display: block !important; }
 	
 	
 	// ALIGN BOTTOM ------------------------------------------------------------------------
@@ -79,13 +83,14 @@ div.dropdown {
 		right: @dropdown-arrow-offset;
 	}
 	
+	&.align-bottom.style-toolbar:after,
 	&.align-bottomRight.style-toolbar:after,
 	&.align-bottomLeft.style-toolbar:after {
 		border-bottom-color: #eee;
 	}
 	
 	
-	// ALIGN BOTTOM ------------------------------------------------------------------------
+	// ALIGN TOP ------------------------------------------------------------------------
 	&.align-top,
 	&.align-topLeft,
 	&.align-topRight {
@@ -261,6 +266,17 @@ div.dropdown {
 	}
 	
 	
+	> .padded {
+		padding: 5px !important;
+		.box-sizing();
+		
+		.model-editor {
+			margin-bottom: 0;
+		}
+		
+		.pull-out { margin-left: -5px; margin-right: 5px;}
+	}
+	
 	
 /*
 	Default Dropdown View
@@ -280,26 +296,96 @@ div.dropdown {
 	
 	
 /*
-	Default Dropdown View
+	Menu Dropdown View
 */
 	.dropdown-menu-view {
 		padding: 1px;
+		max-height: @dropdown-max-height;
+		overflow-y: auto; 
+
 		
-		> li {
+		> li:not(.divider):not(.label-divider) {
 			padding: 7px;
 			cursor: pointer;
 			
 			&:hover {
-				.blue-hover-state();
+				.dark-hover-state();
+				
+				.cursive { color: #bbb; }
 			}
 			
+			&.icon-trash:hover {
+				.red-hover-state()
+			}
+			
+			
 			// icon
-			&:after {
-				vertical-align: top;
-				font-size: .9em;
+			&:before {
+				vertical-align: middle;
+				margin-top: -2px;
+				margin-right: 4px;
+			}
+			
+		}
+		
+		> li.divider,
+		> li.divider:hover {
+			width: 100% !important;
+			height: 1px !important;
+			margin: 1px 0px 1px !important;
+			padding: 0;
+			overflow: hidden;
+			background: #E5E5E5 !important;
+			border-bottom: 1px solid white;
+			cursor: default;
+		}
+		
+		> li.label-divider,
+		> li.label-divider:hover {
+			padding: 2px 5px 0 !important;
+			margin: 3px 0;
+		}
+		
+		&.with-input {
+				
+			input {
+				margin: 0;
+				width: 100%;
+			}
+			
+			> li:first-child,
+			> li:first-child:hover {
+				cursor: default;
+				background: #fff !important;
+			}
+			
+		}
+		
+		
+		&.theme-select {
+			padding-top: 2px;
+			padding-bottom: 2px;
+			
+			> li:not(.divider):not(.label-divider) {
+				padding: 2px 5px 2px 2px;
+				
+				&:hover {
+					background: #f5f5f5;
+					color: @dark;
+					text-shadow: none;
+				}
+				
+				// icon
+				&:before { margin-right: 1px; }
+				&:not(:hover):before {visibility: hidden;}
 			}
 		}
+		
 	}
+	
+	
+	.model-editor + .model-editor:not(.clear) { margin-left: 10px;}
+	.model-editor + .button { margin-left: 10px;}
 	
 	
 
@@ -316,6 +402,12 @@ div.dropdown {
 		input {
 			width: 100%;
 		}
+		
+		.spin-wrapper {
+			position: absolute;
+			right: 19px;
+			top: 18px;
+		}
 	
 	}
  
@@ -325,15 +417,31 @@ div.dropdown {
 */
 	.search-results {
 		max-height: @dropdown-max-height;
-		overflow-y: scroll;
+		overflow-y: auto;
+		
+		&:empty {
+			border-bottom: solid 1px #eee;
+			margin-top: -1px;
+		}
+		
+		// non-results message
+		> p {
+			padding: .5em;
+			line-height: 1.5em;
+			text-transform: none;
+		}
 	
 		> li {
 			padding: 10px 5px;
+			margin: 1px;
 		
 			&.active{
-				.gradient(#4da0f7, #3671c0, #4da0f7);
+				//.gradient(#4da0f7, #3671c0, #4da0f7);
+				background: @dark;
 				color: #fff;
 				text-shadow: rgba(0,0,0,.5) 0 1px 0;
+				
+				.cursive { color: #bbb; }
 			}
 		}
 	}
@@ -343,36 +451,20 @@ div.dropdown {
 	}
 	
 	
-}
+/*
+	Model Preview View
+*/
+	a:hover .model-preview *:not(a) {
+		text-decoration: none !important;
+	}
 
-
-
-
-// !TEMP - move to better location
-.search-results{
-	
-	.book-search-result {
-	
-		p {
-			color: inherit !important;
-			font-size: 1em !important;
-			margin: 0 !important;
-		}
-	
-		.id {
-			font-weight: bold;
-			display: inline-block;
-			width: 35px;
-		}
-		
-		.edition {
-			padding-left: 35px;
-			font-size: .8em !important;
-			line-height: 0;
-			opacity: .6;
-			padding-top: 4px;
-			text-transform: lowercase;
-		}
+	.model-preview {
+		max-height: 200px;
+		overflow-y: auto;
+		overflow-x: hidden;
+		white-space: normal;
+		padding: 10px;
+		position: relative;
 	}
 	
 }
