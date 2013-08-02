@@ -94,7 +94,6 @@ var Dropdown = Backbone.View.extend({
 	},
 	
 	remove: function(){
-		console.log('removeing dropdown');
 		this.unbindTrigger();
 		
 		this.off('dropdown:opened', this.render, this);
