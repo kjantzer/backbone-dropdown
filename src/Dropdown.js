@@ -16,6 +16,8 @@
 		- array (which generates a menu)
 		- Backbone.View
 		- Backbone.Model (prints model.templateData - more for development purposes)
+		- Book.Record (shows "book preview" - see Popover.Views.BookPreview class)
+		- Person.Record (same concept as Book.Record, but not yet coded)
 
 		NOTE: see determineView() method for auto detecting what view should be used; add to it as you see fit
 		
@@ -77,6 +79,8 @@ var Dropdown = Backbone.View.extend({
 		
 		if( this.options.trigger === 'delay' )
 			this.bindDelayedTrigger();
+		if( this.options.trigger === 'hover' )
+			this.bindHoverTrigger();
 		else if( this.options.trigger !== 'none')
 			this.options.renderTo.bind(this.options.trigger, this.toggle.bind(this));
 		
@@ -106,22 +110,30 @@ var Dropdown = Backbone.View.extend({
 		
 		if( this.options.trigger === 'delay' )
 			this.unbindDelayedTrigger();
+		if( this.options.trigger === 'hover' )
+			this.unbindHoverTrigger();
 		else if( this.options.trigger !== 'none')
 			this.options.renderTo.unbind(this.options.trigger, this.toggle.bind(this));
 	},
 	
+	bindHoverTrigger: function(){
+		this.options.renderTo.bind('mouseenter', this.open.bind(this));
+		this.options.renderTo.bind('mouseleave', this.delayEnd.bind(this));
+	},
+	
+	unbindHoverTrigger: function(){
+		this.options.renderTo.unbind('mouseenter', this.open.bind(this));
+		this.options.renderTo.unbind('mouseleave', this.delayEnd.bind(this));
+	},
+	
 	bindDelayedTrigger: function(){
-		
 		this.options.renderTo.bind('mouseenter', this.delayStart.bind(this));
 		this.options.renderTo.bind('mouseleave', this.delayEnd.bind(this));
-		
 	},
 	
 	unbindDelayedTrigger: function(){
-		
 		this.options.renderTo.unbind('mouseenter', this.delayStart.bind(this));
 		this.options.renderTo.unbind('mouseleave', this.delayEnd.bind(this));
-		
 	},
 	
 	delayStart: function(){
@@ -160,6 +172,12 @@ var Dropdown = Backbone.View.extend({
 			
 		else if(_.isArray(this.view))
 			this.view = new DropdownMenuView(this.view, this.options);
+		
+		else if( typeof Book !== 'undefined' && this.view instanceof Book.Record )
+			this.view = new Popover.Views.BookPreview({model: this.view });
+			
+		else if( typeof Person !== 'undefined' && this.view instanceof Person.Record )
+			this.view = new Popover.Views.PersonPreview({model: this.view});
 		
 		else if( this.view instanceof Backbone.Model )
 			this.view = new Popover.Views.ModelPreview({model: this.view});
@@ -428,6 +446,71 @@ Popover.Views.ModelPreview = Backbone.View.extend({
 	
 })
 
+Popover.Views.BookPreview = Popover.Views.ModelPreview.extend({
+
+	className: 'model-preview book-preview',
+
+	template: $('#popover-book-preview').html(),
+	
+	events: {
+		'click .related-books': 'relatedBooks',
+		'click a[href]': 'goToLink'
+	},
+	
+	render: function(){
+	
+		if( this.model.get('is_approved') == null ){
+			this.model.fetch({success: this.render.bind(this)});
+			return;
+		}
+	
+		this.$el.html( _.template(this.template, this.model.templateData()) )
+		
+		// render products if we have them already
+		if( this.model.get('products').length > 0)
+			this.renderProducts();
+			
+		// fetch products from DB
+		this.model.get('products').fetch({success: this.renderProducts.bind(this)});
+	},
+	
+	renderProducts: function(){
+		
+		var id = this.model.id,
+			products = this.model.get('products').active(),
+			$div = this.$('.products');
+		
+		$div.html('<p class="label-divider">'+(_.plural('[num] Product{s}', products.length))+' <a href="/book/'+id+'/products" class="right">edit</a></p>');
+		
+		_.each(products, function(p){
+			
+			var label = p.get('label'),
+				isbn = p.get('isbn_13') || '';
+			
+			$('<p class="product divider dashed"><span class="p-label">'+label+'</span> <span class="cursive right isbn">'+isbn+'</span></p>')
+				.appendTo($div)
+				.find('.p-label').popover(p.quickView(), {w: 185, align: 'rightTop'})
+			
+			
+		})
+	},
+	
+	relatedBooks: function(event){
+		this.model.relatedBooks();
+	},
+	
+	goToLink: function(e){
+		_.goToLink(e);
+	}
+
+});
+
+Popover.Views.PersonPreview = Popover.Views.ModelPreview.extend({
+
+});
+
+
+
 
 /*
 	jQuery Plugin
@@ -461,3 +544,66 @@ $.fn.popover = function( view, opts ) {
 	return this.dropdown(view, opts)
 
 };
+
+
+/*
+	Book Preview Popover
+*/
+$.fn.bookPreviewPopover = function( idOrModel, opts ) {  
+
+	opts = opts || {};
+
+	var model = null;
+	
+	// were we given a Book.Record model?
+	if( idOrModel instanceof Book.Record )
+		model = idOrModel;
+		
+	// were we just given a model (still has book info, but not actually a Book.Record)...then find the Book.Record
+	else if( idOrModel instanceof Backbone.Model && idOrModel.id )
+		model = Book.Record.findOrCreate({id:idOrModel.id});
+	
+	// or was it an ID (number) that we were given?
+	else if( _.isNumber(parseInt(idOrModel)) )
+		model = Book.Record.findOrCreate({id:idOrModel});
+	
+	// if no model found, throw error and stop
+	if( !model )
+		return console.error('!! $.bookPreviewPopover: could not resolve “idOrModel” to a Book.Record: ', idOrModel)
+
+	return this.popover(model, opts)
+
+};
+
+
+
+/*
+	Person Preview Popover
+*/
+$.fn.personPreviewPopover = function( idOrModel, opts ) {  
+
+	opts = opts || {};
+
+	var model = null;
+	
+	// were we given a Person.Record model?
+	if( idOrModel instanceof Person.Record )
+		model = idOrModel;
+		
+	// were we just given a model (still has book info, but not actually a Person.Record)...then find the Person.Record
+	else if( idOrModel instanceof Backbone.Model && idOrModel.id )
+		model = Person.Record.findOrCreate({id:idOrModel.id});
+	
+	// or was it an ID (number) that we were given?
+	else if( _.isNumber(parseInt(idOrModel)) )
+		model = Person.Record.findOrCreate({id:idOrModel});
+	
+	// if no model found, throw error and stop
+	if( !model )
+		return console.error('!! $.personPreviewPopover: could not resolve “idOrModel” to a Person.Record: ', idOrModel)
+
+	return this.popover(model, opts)
+
+};
+
+	

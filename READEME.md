@@ -2,7 +2,7 @@
 
 Easily create dropdown (or popover) views for menus, inline editing, or just a simple tooltip. Has support for many locations (bottomLeft, bottom, bottomRight; on all sides)
 
-![preview](http://cl.ly/image/0B1a3p3j2416/backbonejs-dropdown-view-preview.png)
+![preview](http://i.imgur.com/SJvBzeN.png)
 
 ### Requires
 - LESS

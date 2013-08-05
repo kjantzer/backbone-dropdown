@@ -1,7 +1,5 @@
 /*
 	Dropdown - dropdown view for Backbone
-	
-	note: requires elements.less
 */
 
 @dropdown-arrow-offset: 5px;
@@ -301,7 +299,8 @@ div.dropdown {
 	.dropdown-menu-view {
 		padding: 1px;
 		max-height: @dropdown-max-height;
-		overflow-y: auto; 
+		overflow-y: auto;
+		margin: 0;
 
 		
 		> li:not(.divider):not(.label-divider) {
@@ -331,7 +330,7 @@ div.dropdown {
 		> li.divider,
 		> li.divider:hover {
 			width: 100% !important;
-			height: 1px !important;
+			height: 2px !important;
 			margin: 1px 0px 1px !important;
 			padding: 0;
 			overflow: hidden;
@@ -465,6 +464,115 @@ div.dropdown {
 		white-space: normal;
 		padding: 10px;
 		position: relative;
+	}
+	
+	
+	.book-preview {
+	
+		.is-approved {
+			position: absolute;
+			top: 5px;
+			right: 1px;
+			color: @green;
+		}
+		
+		img.preview-artwork {
+			width: 45px;
+			height: 45px;
+			.rounded(4px);
+			float: left;
+		}
+		
+		.main-info {
+			margin-left: 55px;
+		}
+		
+		.preview-details {
+			font-size: .75em;
+			text-transform: uppercase;
+			color: #aaa;
+			font-weight: bold;
+			line-height: 1.3em;
+		}
+		
+		.preview-title {
+			font-size: 16px;
+			font-weight: normal;
+			width: auto;
+			line-height: 1.1em;
+			min-height: 1.1em;
+		}
+		
+		.preview-subtitle {
+			font-size: 13px;
+			//font-style: italic;
+			font-weight: normal;
+			min-height: 0;
+		}
+		
+		.preview-metadata {
+			color: #999;
+			font-size: .9em;
+		}
+		
+		
+		.label-divider {
+			margin: 0 -10px 10px;
+			padding: 2px 10px;
+		}
+		
+		.products {
+			clear: both;
+			margin: 10px 0;
+			
+			.product .isbn {
+				font-size: 1em;
+			}
+			
+			.dropdown {
+				margin-left: -1px;
+				margin-bottom: -5px;
+			}
+			
+			.product-quickview {
+				height: 90px;
+				overflow-y: auto;
+			}
+			
+		}
+		
+	}
+	
+}
+
+
+
+
+// !TEMP - move to better location
+.search-results{
+	
+	.book-search-result {
+	
+		p {
+			color: inherit !important;
+			font-size: 1em !important;
+			margin: 0 !important;
+		}
+	
+		.id {
+			font-weight: bold;
+			display: inline-block;
+			width: 35px;
+		}
+		
+		.edition {
+			padding-left: 35px;
+			font-size: .8em !important;
+			line-height: 0;
+			opacity: .6;
+			padding-top: 4px;
+			text-transform: lowercase;
+		}
 	}
 	
 }

@@ -1,0 +1,800 @@
+/*---------------------------------------------------
+    LESS Elements 0.6
+  ---------------------------------------------------
+    A set of useful LESS mixins by Dmitry Fadeyev
+    Special thanks for mixin suggestions to:
+      Kris Van Herzeele,
+      Benoit Adam,
+      Portenart Emile-Victor,
+      Ryan Faerman
+
+    Additional mixins by Kevin Jantzer
+
+    More info at: http://lesselements.com
+-----------------------------------------------------*/
+.clear {
+  border: none;
+  float: none;
+  clear: both;
+  background: no-repeat;
+  margin: 0;
+  padding: 0;
+}
+.clearfix:before,
+.container:after {
+  content: "";
+  display: table;
+}
+.clearfix:after {
+  clear: both;
+}
+/*
+	Arrows 
+*/
+/* @end Arrows */
+/* Center text */
+h1.center,
+h2.center,
+h3.center,
+h4.center,
+h5.center,
+h6.center,
+p.center {
+  text-align: center;
+}
+.cursive {
+  color: #999;
+  font-family: 'Times New Roman';
+  font-style: italic;
+  font-size: .85em;
+  text-transform: none;
+}
+.ucase,
+.caps {
+  text-transform: uppercase;
+}
+.lcase {
+  text-transform: lowercase;
+}
+ins {
+  color: green;
+  background: #DFD;
+  text-decoration: none;
+}
+del {
+  color: red;
+  background: #FDD;
+  text-decoration: none;
+}
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* make any element look like a link */
+.link {
+  cursor: pointer;
+}
+.link:hover {
+  text-decoration: underline;
+}
+/* hide elements based on whether they have content */
+.hide-on-empty[data-content=""],
+.hide-on-zero[data-content=""],
+.hide-on-zero[data-content="0"] {
+  display: none !important;
+}
+/* github style code element */
+code {
+  margin: 0 2px;
+  padding: 0px 5px;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px;
+  font-size: 12px;
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
+}
+/* creates a divider line with text
+    expects <el><span>Title Here</span></el> (where el = h1, h2, etc)
+*/
+h1.divider,
+h2.divider,
+h3.divider,
+h4.divider,
+h5.divider,
+h6.divider,
+p.divider {
+  position: relative;
+  color: #999;
+  /* create the dashed line */
+
+}
+h1.divider > span,
+h2.divider > span,
+h3.divider > span,
+h4.divider > span,
+h5.divider > span,
+h6.divider > span,
+p.divider > span {
+  background: #fff;
+  position: relative;
+  padding-right: 10px;
+}
+h1.divider > span + span,
+h2.divider > span + span,
+h3.divider > span + span,
+h4.divider > span + span,
+h5.divider > span + span,
+h6.divider > span + span,
+p.divider > span + span {
+  padding-right: 0;
+  padding-left: 10px;
+}
+h1.divider.align-right,
+h2.divider.align-right,
+h3.divider.align-right,
+h4.divider.align-right,
+h5.divider.align-right,
+h6.divider.align-right,
+p.divider.align-right {
+  text-align: right;
+}
+h1.divider.align-right > span,
+h2.divider.align-right > span,
+h3.divider.align-right > span,
+h4.divider.align-right > span,
+h5.divider.align-right > span,
+h6.divider.align-right > span,
+p.divider.align-right > span {
+  padding-left: 10px;
+  padding-right: 0;
+}
+h1.divider.align-center,
+h2.divider.align-center,
+h3.divider.align-center,
+h4.divider.align-center,
+h5.divider.align-center,
+h6.divider.align-center,
+p.divider.align-center {
+  text-align: center;
+}
+h1.divider.align-center > span,
+h2.divider.align-center > span,
+h3.divider.align-center > span,
+h4.divider.align-center > span,
+h5.divider.align-center > span,
+h6.divider.align-center > span,
+p.divider.align-center > span {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+h1.divider:before,
+h2.divider:before,
+h3.divider:before,
+h4.divider:before,
+h5.divider:before,
+h6.divider:before,
+p.divider:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 1px;
+  width: 100%;
+  border-top: solid 1px #ccc;
+}
+h1.divider.dashed:before,
+h2.divider.dashed:before,
+h3.divider.dashed:before,
+h4.divider.dashed:before,
+h5.divider.dashed:before,
+h6.divider.dashed:before,
+p.divider.dashed:before {
+  border-top-style: dashed;
+}
+/* creates iOS itunes style label divider
+    great for seperating items in lists
+*/
+.label-divider {
+  background: #f1f1f1;
+  padding: 5px 15px;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: .8em;
+  -webkit-box-shadow: #cccccc 0 1px 3px;
+  -moz-box-shadow: #cccccc 0 1px 3px;
+  box-shadow: #cccccc 0 1px 3px;
+  border-top: solid 1px #ddd;
+  border-bottom: solid 1px #fff;
+}
+.label-divider:first-child,
+.label-divider.first {
+  border-top: none;
+}
+.label-divider.spacer {
+  margin: 30px 0 20px;
+}
+.label-divider.spacer-top {
+  margin-top: 30px;
+}
+.label-divider.spacer-bottom {
+  margin-bottom: 20px;
+}
+.label-divider.pull-out {
+  margin-left: -15px;
+  margin-right: -15px;
+}
+.label-divider.pull-out-out {
+  margin-left: -30px;
+  margin-right: -30px;
+}
+.label-divider:before {
+  margin-right: 7px;
+}
+.label-divider a {
+  color: #aaa;
+}
+/* make things look like a stamp */
+.stamp {
+  text-transform: uppercase;
+  border: solid 3px #222;
+  display: inline-block;
+  padding: .5em;
+  color: #222;
+  font-family: Impact;
+  font-size: 1em;
+  -webkit-transform: rotate(-20deg);
+  -moz-transform: rotate(-20deg);
+  transform: rotate(-20deg);
+  position: absolute;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  text-shadow: none;
+}
+/* simple and subtle tabs */
+.tabs {
+  border-bottom: solid 1px #ccc;
+  padding: 0 5px;
+  margin-bottom: 10px;
+}
+.tabs.pull-out {
+  padding: 0 15px;
+}
+.tabs > a {
+  cursor: default;
+  text-decoration: none !important;
+  display: inline-block;
+  padding: 7px 10px;
+  color: #aaa;
+  -webkit-border-top-right-radius: 3px;
+  -webkit-border-bottom-right-radius: 0px;
+  -webkit-border-bottom-left-radius: 0;
+  -webkit-border-top-left-radius: 3px;
+  -moz-border-radius-topright: 3px;
+  -moz-border-radius-bottomright: 0px;
+  -moz-border-radius-bottomleft: 0;
+  -moz-border-radius-topleft: 3px;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 3px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  margin-bottom: -1px;
+  float: left;
+  border: solid 1px transparent;
+}
+.tabs > a:not(.active):hover {
+  cursor: pointer;
+  color: #333;
+}
+.tabs > a + a {
+  margin-left: -1px;
+}
+.tabs > a.active {
+  border-color: #ccc;
+  border-bottom-color: #fff;
+}
+/*
+	Dropdown - dropdown view for Backbone
+*/
+div.dropdown {
+  cursor: default;
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  background: #fff;
+  border: solid 1px #bbb;
+  -webkit-box-shadow: #999999 0 1px 3px;
+  -moz-box-shadow: #999999 0 1px 3px;
+  box-shadow: #999999 0 1px 3px;
+  width: 200px;
+  display: none !important;
+  min-height: 20px;
+  max-height: 400px;
+  font-size: 12px;
+  line-height: 1.3em;
+  font-weight: normal;
+  text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;
+  text-align: left;
+  color: #444;
+  text-transform: none;
+  /*
+	Default Dropdown View
+*/
+
+  /*
+	Menu Dropdown View
+*/
+
+  /*
+	Search Bar
+*/
+
+  /*
+	Search Results
+*/
+
+  /*
+	Model Preview View
+*/
+
+}
+div.dropdown.open {
+  display: block !important;
+}
+div.dropdown.align-bottom,
+div.dropdown.align-bottomLeft,
+div.dropdown.align-bottomRight {
+  top: 100%;
+  margin-top: 10px;
+}
+div.dropdown.align-bottomRight {
+  left: -1px;
+  right: auto;
+}
+div.dropdown.align-bottomLeft {
+  right: -1px;
+  left: auto;
+}
+div.dropdown.align-bottom:before,
+div.dropdown.align-bottom:after,
+div.dropdown.align-bottomLeft:before,
+div.dropdown.align-bottomLeft:after,
+div.dropdown.align-bottomRight:before,
+div.dropdown.align-bottomRight:after {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 5px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #fff;
+}
+div.dropdown.align-bottom:before,
+div.dropdown.align-bottomRight:before,
+div.dropdown.align-bottomLeft:before {
+  border-bottom-color: #999;
+  top: -8px;
+}
+div.dropdown.align-bottom:before,
+div.dropdown.align-bottom:after {
+  left: 50%;
+  margin-left: -8px;
+}
+div.dropdown.align-bottomLeft:before,
+div.dropdown.align-bottomLeft:after {
+  left: auto;
+  right: 5px;
+}
+div.dropdown.align-bottom.style-toolbar:after,
+div.dropdown.align-bottomRight.style-toolbar:after,
+div.dropdown.align-bottomLeft.style-toolbar:after {
+  border-bottom-color: #eee;
+}
+div.dropdown.align-top,
+div.dropdown.align-topLeft,
+div.dropdown.align-topRight {
+  top: auto;
+  bottom: 100%;
+  margin-bottom: 10px;
+}
+div.dropdown.align-topRight {
+  left: -1px;
+  right: auto;
+}
+div.dropdown.align-topLeft {
+  right: -1px;
+  left: auto;
+}
+div.dropdown.align-top:before,
+div.dropdown.align-top:after,
+div.dropdown.align-topLeft:before,
+div.dropdown.align-topLeft:after,
+div.dropdown.align-topRight:before,
+div.dropdown.align-topRight:after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 5px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #fff;
+}
+div.dropdown.align-top:before,
+div.dropdown.align-topRight:before,
+div.dropdown.align-topLeft:before {
+  border-top-color: #999;
+  bottom: -8px;
+}
+div.dropdown.align-top:before,
+div.dropdown.align-top:after {
+  left: 50%;
+  margin-left: -8px;
+}
+div.dropdown.align-topLeft:before,
+div.dropdown.align-topLeft:after {
+  left: auto;
+  right: 5px;
+}
+div.dropdown.align-topRight.style-toolbar:after,
+div.dropdown.align-topLeft.style-toolbar:after {
+  border-top-color: #eee;
+}
+div.dropdown.align-left,
+div.dropdown.align-leftTop,
+div.dropdown.align-leftBottom {
+  left: auto;
+  right: 100%;
+  margin-right: 10px;
+  top: -1px;
+}
+div.dropdown.align-leftTop {
+  bottom: -1px;
+  top: auto;
+}
+div.dropdown.align-leftBottom {
+  bottom: auto;
+  top: -1px;
+}
+div.dropdown.align-left:before,
+div.dropdown.align-left:after,
+div.dropdown.align-leftTop:before,
+div.dropdown.align-leftTop:after,
+div.dropdown.align-leftBottom:before,
+div.dropdown.align-leftBottom:after {
+  content: '';
+  position: absolute;
+  right: -7px;
+  top: 5px;
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid #fff;
+}
+div.dropdown.align-left:before,
+div.dropdown.align-leftTop:before,
+div.dropdown.align-leftBottom:before {
+  border-left-color: #999;
+  right: -8px;
+}
+div.dropdown.align-left:before,
+div.dropdown.align-left:after {
+  top: 50%;
+  margin-top: -8px;
+}
+div.dropdown.align-leftTop:before,
+div.dropdown.align-leftTop:after {
+  top: auto;
+  bottom: 5px;
+}
+div.dropdown.align-left.style-toolbar:after,
+div.dropdown.align-leftTop.style-toolbar:after,
+div.dropdown.align-leftBottom.style-toolbar:after {
+  border-left-color: #e4e4e4;
+}
+div.dropdown.align-right,
+div.dropdown.align-rightTop,
+div.dropdown.align-rightBottom {
+  right: auto;
+  left: 100%;
+  margin-left: 10px;
+  top: -1px;
+}
+div.dropdown.align-rightTop {
+  bottom: -1px;
+  top: auto;
+}
+div.dropdown.align-rightBottom {
+  bottom: auto;
+  top: -1px;
+}
+div.dropdown.align-right:before,
+div.dropdown.align-right:after,
+div.dropdown.align-rightTop:before,
+div.dropdown.align-rightTop:after,
+div.dropdown.align-rightBottom:before,
+div.dropdown.align-rightBottom:after {
+  content: '';
+  position: absolute;
+  left: -7px;
+  top: 5px;
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid #fff;
+}
+div.dropdown.align-right:before,
+div.dropdown.align-rightTop:before,
+div.dropdown.align-rightBottom:before {
+  border-right-color: #999;
+  left: -8px;
+}
+div.dropdown.align-right:before,
+div.dropdown.align-right:after {
+  top: 50%;
+  margin-top: -8px;
+}
+div.dropdown.align-rightTop:before,
+div.dropdown.align-rightTop:after {
+  top: auto;
+  bottom: 5px;
+}
+div.dropdown.align-right.style-toolbar:after,
+div.dropdown.align-rightBottom.style-toolbar:after {
+  border-right-color: #e4e4e4;
+}
+div.dropdown > .padded {
+  padding: 5px !important;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+div.dropdown > .padded .model-editor {
+  margin-bottom: 0;
+}
+div.dropdown > .padded .pull-out {
+  margin-left: -5px;
+  margin-right: 5px;
+}
+div.dropdown .dropdown-text-view {
+  padding: 7px;
+}
+div.dropdown .dropdown-text-view > p {
+  line-height: 1.2em;
+  margin-bottom: 1em;
+}
+div.dropdown .dropdown-text-view > *:last-child {
+  margin-bottom: 0;
+}
+div.dropdown .dropdown-menu-view {
+  padding: 1px;
+  max-height: 400px;
+  overflow-y: auto;
+  margin: 0;
+}
+div.dropdown .dropdown-menu-view > li:not(.divider):not(.label-divider) {
+  padding: 7px;
+  cursor: pointer;
+}
+div.dropdown .dropdown-menu-view > li:not(.divider):not(.label-divider):hover {
+  background: #444444;
+  color: #fff;
+  text-shadow: rgba(0, 0, 0, 0.5) 0 1px 0;
+}
+div.dropdown .dropdown-menu-view > li:not(.divider):not(.label-divider):hover .cursive {
+  color: #bbb;
+}
+div.dropdown .dropdown-menu-view > li:not(.divider):not(.label-divider).icon-trash:hover {
+  background: #ff0000;
+  color: #fff;
+  text-shadow: rgba(0, 0, 0, 0.5) 0 1px 0;
+}
+div.dropdown .dropdown-menu-view > li:not(.divider):not(.label-divider):before {
+  vertical-align: middle;
+  margin-top: -2px;
+  margin-right: 4px;
+}
+div.dropdown .dropdown-menu-view > li.divider,
+div.dropdown .dropdown-menu-view > li.divider:hover {
+  width: 100% !important;
+  height: 2px !important;
+  margin: 1px 0px 1px !important;
+  padding: 0;
+  overflow: hidden;
+  background: #E5E5E5 !important;
+  border-bottom: 1px solid white;
+  cursor: default;
+}
+div.dropdown .dropdown-menu-view > li.label-divider,
+div.dropdown .dropdown-menu-view > li.label-divider:hover {
+  padding: 2px 5px 0 !important;
+  margin: 3px 0;
+}
+div.dropdown .dropdown-menu-view.with-input input {
+  margin: 0;
+  width: 100%;
+}
+div.dropdown .dropdown-menu-view.with-input > li:first-child,
+div.dropdown .dropdown-menu-view.with-input > li:first-child:hover {
+  cursor: default;
+  background: #fff !important;
+}
+div.dropdown .dropdown-menu-view.theme-select {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+div.dropdown .dropdown-menu-view.theme-select > li:not(.divider):not(.label-divider) {
+  padding: 2px 5px 2px 2px;
+}
+div.dropdown .dropdown-menu-view.theme-select > li:not(.divider):not(.label-divider):hover {
+  background: #f5f5f5;
+  color: #444444;
+  text-shadow: none;
+}
+div.dropdown .dropdown-menu-view.theme-select > li:not(.divider):not(.label-divider):before {
+  margin-right: 1px;
+}
+div.dropdown .dropdown-menu-view.theme-select > li:not(.divider):not(.label-divider):not(:hover):before {
+  visibility: hidden;
+}
+div.dropdown .model-editor + .model-editor:not(.clear) {
+  margin-left: 10px;
+}
+div.dropdown .model-editor + .button {
+  margin-left: 10px;
+}
+div.dropdown .search-bar {
+  background: #dddddd;
+  background: -webkit-gradient(linear, left bottom, left top, color-stop(0, #dddddd), color-stop(1, #eeeeee));
+  background: -ms-linear-gradient(bottom, #dddddd, #eeeeee);
+  background: -moz-linear-gradient(center bottom, #dddddd 0%, #eeeeee 100%);
+  padding: 2px 5px;
+  border-bottom: solid 1px #bbb;
+  -webkit-box-shadow: #ffffff 0 1px 0 inset;
+  -moz-box-shadow: #ffffff 0 1px 0 inset;
+  box-shadow: #ffffff 0 1px 0 inset;
+  height: 31px;
+}
+div.dropdown .search-bar input {
+  width: 100%;
+}
+div.dropdown .search-bar .spin-wrapper {
+  position: absolute;
+  right: 19px;
+  top: 18px;
+}
+div.dropdown .search-results {
+  max-height: 400px;
+  overflow-y: auto;
+}
+div.dropdown .search-results:empty {
+  border-bottom: solid 1px #eee;
+  margin-top: -1px;
+}
+div.dropdown .search-results > p {
+  padding: .5em;
+  line-height: 1.5em;
+  text-transform: none;
+}
+div.dropdown .search-results > li {
+  padding: 10px 5px;
+  margin: 1px;
+}
+div.dropdown .search-results > li.active {
+  background: #444444;
+  color: #fff;
+  text-shadow: rgba(0, 0, 0, 0.5) 0 1px 0;
+}
+div.dropdown .search-results > li.active .cursive {
+  color: #bbb;
+}
+div.dropdown .search-bar + .search-results {
+  max-height: 364px;
+}
+div.dropdown a:hover .model-preview *:not(a) {
+  text-decoration: none !important;
+}
+div.dropdown .model-preview {
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  white-space: normal;
+  padding: 10px;
+  position: relative;
+}
+div.dropdown .book-preview .is-approved {
+  position: absolute;
+  top: 5px;
+  right: 1px;
+  color: #008000;
+}
+div.dropdown .book-preview img.preview-artwork {
+  width: 45px;
+  height: 45px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  float: left;
+}
+div.dropdown .book-preview .main-info {
+  margin-left: 55px;
+}
+div.dropdown .book-preview .preview-details {
+  font-size: .75em;
+  text-transform: uppercase;
+  color: #aaa;
+  font-weight: bold;
+  line-height: 1.3em;
+}
+div.dropdown .book-preview .preview-title {
+  font-size: 16px;
+  font-weight: normal;
+  width: auto;
+  line-height: 1.1em;
+  min-height: 1.1em;
+}
+div.dropdown .book-preview .preview-subtitle {
+  font-size: 13px;
+  font-weight: normal;
+  min-height: 0;
+}
+div.dropdown .book-preview .preview-metadata {
+  color: #999;
+  font-size: .9em;
+}
+div.dropdown .book-preview .label-divider {
+  margin: 0 -10px 10px;
+  padding: 2px 10px;
+}
+div.dropdown .book-preview .products {
+  clear: both;
+  margin: 10px 0;
+}
+div.dropdown .book-preview .products .product .isbn {
+  font-size: 1em;
+}
+div.dropdown .book-preview .products .dropdown {
+  margin-left: -1px;
+  margin-bottom: -5px;
+}
+div.dropdown .book-preview .products .product-quickview {
+  height: 90px;
+  overflow-y: auto;
+}
+.search-results .book-search-result p {
+  color: inherit !important;
+  font-size: 1em !important;
+  margin: 0 !important;
+}
+.search-results .book-search-result .id {
+  font-weight: bold;
+  display: inline-block;
+  width: 35px;
+}
+.search-results .book-search-result .edition {
+  padding-left: 35px;
+  font-size: .8em !important;
+  line-height: 0;
+  opacity: .6;
+  padding-top: 4px;
+  text-transform: lowercase;
+}
+.dd {
+  position: relative;
+}
