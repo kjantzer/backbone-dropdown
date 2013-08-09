@@ -27,6 +27,8 @@
 	@author Kevin Jantzer, Blackstone Audio
 	@since 2012-12-14
 	
+	https://github.com/kjantzer/backbonejs-dropdown-view
+	
 */
 
 var Dropdown = Backbone.View.extend({
@@ -198,7 +200,7 @@ var Dropdown = Backbone.View.extend({
 	toggle: function(e){
 	
 		if(this.isOpen !== true)
-			this.open(e);
+			_.defer(this.open.bind(this,e));
 		else
 			this.close(e);
 			
@@ -207,8 +209,6 @@ var Dropdown = Backbone.View.extend({
 	open: function(e){
 		
 		clearTimeout(this.closeTimeout);
-		
-		if(e) e.stopPropagation();
 	
 		if(this.isOpen) return; // don't do anything if we are already open
 	
