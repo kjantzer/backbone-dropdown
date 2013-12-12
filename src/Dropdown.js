@@ -43,9 +43,11 @@ var Dropdown = Backbone.View.extend({
 		w: 200,
 		align: 'bottomRight',	// bottomLeft, bottom, bottomRight, leftTop, left, leftBottom, etc, also "auto"
 		autoCenter: false,		// centers dropdown to renderTo el with the arrow as the center point
+		alignVerticalToParent: false,
 		style: 'default',		// toolbar - DEPRECATED, use theme
 		theme: 'default',		// 'toolbar', 'select'
 		closeOn: 'body',		// body, el
+		closeOnEsc: true,
 		view: null, 			// view to be rendered ( see @param "view" above for documentation)
 		trigger: 'click',		// click, dbclick, hover, delay, none (will open upon init and be removed when closed)
 		delay: 1000,			// delay duration when using trigger='delay'
@@ -76,15 +78,20 @@ var Dropdown = Backbone.View.extend({
 		
 		
 		// close
-		if(this.options.closeOn == 'body')
-			$('html').click(_.bind(this.close, this));
+		if(this.options.closeOn == 'body'){
+			document.body.addEventListener('click', this.deferClose.bind(this), true);
+			this.el.addEventListener('click', this.stopDeferClose.bind(this), true);
+		}
+		
+		if( this.options.closeOnEsc )
+			document.body.addEventListener('keyup', this.closeOnEsc.bind(this), false);
 		
 		if( this.options.trigger === 'delay' )
 			this.bindDelayedTrigger();
 		if( this.options.trigger === 'hover' )
 			this.bindHoverTrigger();
 		else if( this.options.trigger !== 'none')
-			this.options.renderTo.bind(this.options.trigger, this.toggle.bind(this));
+			this.options.renderTo[0].addEventListener(this.options.trigger, this.toggle.bind(this), false);
 		
 		this.setup()
 	
@@ -93,6 +100,7 @@ var Dropdown = Backbone.View.extend({
 	
 		// listen for the view telling us to close
 		this.view.on('dropdown:close', this.close, this);
+		this.view.on('dropdown:open', this.open, this);
 		
 		if( this.options.trigger === 'none' || this.options.openOnInit )
 			_.defer(this.open.bind(this));
@@ -104,6 +112,7 @@ var Dropdown = Backbone.View.extend({
 		
 		this.off('dropdown:opened', this.render, this);
 		this.view.off('dropdown:close', this.close, this);
+		this.view.off('dropdown:open', this.open, this);
 		
 		this.$el.remove();
 	},
@@ -168,21 +177,25 @@ var Dropdown = Backbone.View.extend({
 	
 	determineView: function(){
 		
+		var view = this.view;
+		
+		if( _.isFunction(view) ) this.view = view = view();
+		
 		// if the given view is a string, then load that string with a "default dropdown view"
-		if(_.isString(this.view))
+		if(_.isString(view) || view instanceof jQuery)
 			this.view = new DropdownTextView({html:this.view});
 			
-		else if(_.isArray(this.view))
-			this.view = new DropdownMenuView(this.view, this.options);
+		else if(_.isArray(view))
+			this.view = new DropdownMenuView(view, this.options);
 		
-		else if( typeof Book !== 'undefined' && this.view instanceof Book.Record )
-			this.view = new Popover.Views.BookPreview({model: this.view });
+		else if( typeof Book !== 'undefined' && view instanceof Book.Record )
+			this.view = new Popover.Views.BookPreview({model: view });
 			
-		else if( typeof Person !== 'undefined' && this.view instanceof Person.Record )
-			this.view = new Popover.Views.PersonPreview({model: this.view});
+		else if( typeof Person !== 'undefined' && view instanceof Person.Record )
+			this.view = new Popover.Views.PersonPreview({model: view});
 		
-		else if( this.view instanceof Backbone.Model )
-			this.view = new Popover.Views.ModelPreview({model: this.view});
+		else if( view instanceof Backbone.Model )
+			this.view = new Popover.Views.ModelPreview({model: view});
 	},
 	
 	render: function(){
@@ -200,19 +213,23 @@ var Dropdown = Backbone.View.extend({
 	toggle: function(e){
 	
 		if(this.isOpen !== true)
-			_.defer(this.open.bind(this,e));
+			this.open(e);
 		else
-			this.close(e);
-			
+			this.close(e);	
 	},
 	
 	open: function(e){
 		
 		clearTimeout(this.closeTimeout);
-	
+		clearTimeout(this.deferCloseTimeout)
+		
+		if(e)
+			e.stopPropagation();
+		
 		if(this.isOpen) return; // don't do anything if we are already open
 	
 		this.isOpen = true;
+		this.options.renderTo.addClass('dropdown-open')
 		this.$el.addClass('open');
 		this.trigger('dropdown:opened');
 		this.view.trigger('dropdown:opened'); // tell the inner view we've opened
@@ -225,12 +242,25 @@ var Dropdown = Backbone.View.extend({
 		if(!this.isOpen) return; // don't do anything if we are already closed
 	
 		this.isOpen = false;
+		this.options.renderTo.removeClass('dropdown-open')
 		this.$el.removeClass('open');
 		this.trigger('dropdown:closed');
 		this.view.trigger('dropdown:closed'); // tell the inner view we've closed
 		
 		if( this.options.trigger === 'none' )
 			_.defer(this.remove.bind(this))
+	},
+	
+	closeOnEsc: function(e){
+		if(e.which == 27) this.deferClose();
+	},
+	
+	deferClose: function(){
+		this.deferCloseTimeout = setTimeout(this.close.bind(this), 0);
+	},
+	
+	stopDeferClose: function(e){
+		clearTimeout(this.deferCloseTimeout)
 	},
 	
 	adjustPosition: function(){
@@ -246,6 +276,10 @@ var Dropdown = Backbone.View.extend({
 			
 		else
 			this.autoCenter();
+			
+		if( this.options.alignVerticalToParent ){
+			this.el.style.top = this.options.renderTo[0].offsetTop;
+		}
 	},
 	
 	alignVerticalMiddle: function(){
@@ -336,7 +370,7 @@ var DropdownTextView = Backbone.View.extend({
 	
 		var html = this.options.html;
 	
-		if( !/^</.test(html) )
+		if( !(html instanceof jQuery ) && !/^</.test(html) )
 			html = '<p>'+html+'</p>';
 	
 		this.$el.html( html );
@@ -346,24 +380,71 @@ var DropdownTextView = Backbone.View.extend({
 
 var DropdownMenuView = Backbone.View.extend({
 
-	tagName: 'ul',
+	tagName: 'div',
 	
 	className: 'dropdown-menu-view',
 	
 	initialize: function(menu, opts){
 		
-		this.options = opts || {};
+		this.menu = menu;
+		
+		this.options = _.extend({
+		
+			search: true,			// turns search on if more values than threshold
+			searchMinScore: .7,
+			searchThreshold: 20
+			
+		}, opts || {});
 		
 		this.$el.addClass('theme-'+this.options.theme)
 		
-		_.each(menu, this.addItem, this);
+		if( this.options.search != false && menu.length > this.options.searchThreshold ){
+			$('<div class="search-bar"></div>')
+				.appendTo(this.$el)
+				.append( this.$search = $('<input type="text" class="search" placeholder="Filter...">').on('keyup', this.onSearch.bind(this)) )
+		}
 		
+		this.$ul = $('<ul class="dropdown-menu-view"></ul>').appendTo(this.$el);
+		
+		this.addItems();
+		
+	},
+	
+	render: function(){
+		this.delegateEvents();
+		_.defer(this.focus.bind(this));
+		return this;
+	},
+	
+	onSearch: function(e){
+		this.term = e.currentTarget.value;
+		this.addItems();
+	},
+	
+	focus: function(){
+		if(this.$search) this.$search.focus();
+	},
+	
+	addItems: function(){
+		this.$ul.html('');
+		_.each(this.menu, this.addItem, this);
 	},
 	
 	addItem: function(item){
 	
-		if( item && (item === 'divider' || item.divider) )
+		var $el = this.$ul ? this.$ul : this.$el;
+	
+		if( item && (item === 'divider' || item.divider) && !this.term )
 			return this.addDivider(item);
+		
+		if( _.isString(item) )
+			item = {
+				label: item,
+				val: item
+			}
+			
+		if( this.term && _.score(item.label||'', this.term) < this.options.searchMinScore)
+			return;
 		
 		item = _.extend({
 			label: 'No Label',
@@ -380,35 +461,56 @@ var DropdownMenuView = Backbone.View.extend({
 		if( this.options.theme == 'select' )
 			className += ' icon-plus';
 		
-		var $li = $('<li class="'+className+'">'+item.label+'</li>').appendTo(this.$el);
+		var $li = $('<li class="'+className+'">'+item.label+'</li>').appendTo($el);
 		
 		if(item.icon)
 			$li.addClass('icon-'+item.icon);
+			
+		if(item.border)
+			$li.css('border-right', 'solid 4px '+this.borderColor(item.border));
 		
-		if( item.onClick )
+		if( item.onClick || this.options.onClick )
 		$li.click(_.bind(function(){
 			
 			if(item.onClick === 'trigger')
 				this.trigger('click', item, $li);
 			else if( item.onClick )
 				item.onClick(item, $li);
+			else if( this.options.onClick )
+				this.options.onClick(item, $li);
 			
 			this.trigger('dropdown:close')
 			
 		},this));
 		
 		
-		if( item.dropdown && item.dropdown.view)
+		if( item.dropdown && item.dropdown.view){
+			item.dropdown.alignVerticalToParent = true;
 			$li.dropdown(item.dropdown.view, item.dropdown);
+		}
 		
 	},
 	
 	addDivider: function(item){
 		
+		var $el = this.$ul ? this.$ul : this.$el;
+		
 		if( item.divider )
-			$('<li class="label-divider">'+item.divider+'</li>').appendTo(this.$el);
+			$('<li class="label-divider">'+item.divider+'</li>').appendTo($el);
 		else
-			$('<li class="divider"></li>').appendTo(this.$el);
+			$('<li class="divider"></li>').appendTo($el);
+	},
+	
+	borderColor: function(color){
+		switch(color){
+			case 'gray': return '#ccc'; break;
+			case 'blue': return '#2981E4'; break;
+			case 'red': return '#b94a48'; break;
+			case 'yellow': return '#f0cb37'; break;
+			case 'green': return '#468847'; break;
+			default: return color; break
+			
+		}
 	}
 	
 })
@@ -521,7 +623,7 @@ $.fn.dropdown = function( view, opts ) {
 
 	return this.each(function() {
 		
-		new Dropdown(_.extend({renderTo: $(this), view:view}, opts));
+		$(this).data('dropdown', new Dropdown(_.extend({renderTo: $(this), view:view}, opts)) );
 	
 	});
 

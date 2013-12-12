@@ -19,6 +19,8 @@
 <script src="lib/underscore.min.js"></script>
 <script src="lib/backbone.min.js"></script>
 
+<script src="lib/LiquidMetal.js"></script> <!-- scoring algorithm for searching -->
+
 <!-- Bootstrap 3 - http://getbootstrap.com -->
 <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
 
@@ -70,7 +72,81 @@
 		<a id="menu3" class="btn btn-default dd">Menu with Event Triggers</a>
 		<a class="btn btn-default dd" onclick="$(this).dropdown('This loaded programatically', {trigger: 'none', align: 'topLeft'})">Programatic</a>
 		
+		<br><br>
 		
+		<a id="menu4" class="btn btn-default dd">Use as a select</a>
+		
+	</div>
+	
+	<h3>How to use</h3>
+	<p>Creating a Dropdown is very simple.</p>
+	<div class="clearfix panel">
+	
+<pre><code>
+/*
+	Simple Tooltip
+*/
+	$('#simple-tooltip').dropdown(
+				'This is a tooltip', 
+				{align: 'topRight', 
+				trigger: 'hover'});
+	
+	
+/*
+	Menu
+*/
+	$('#menu').dropdown([
+		{
+			label:'Item 1', 
+			onClick: function(){ 
+				alert('item 1 clicked') 
+			}
+		},{
+			label:'Item 2',
+			onClick: function(){
+				alert('item 2 clicked')
+			}
+		},{
+			label:'Item 3', 
+			onClick: function(){
+				alert('item 3 clicked')
+			}
+		}
+	], { w:70, align: 'bottom'})
+	
+	
+/*
+	Menu with Dividers
+*/
+	$('#menu2').dropdown([
+		{'divider': 'Options'},
+		{label:'Item 1', onClick: function(){ alert('item 1 clicked') }},
+		{label:'Item 2', onClick: function(){ alert('item 2 clicked') }},
+		'divider',
+		{label:'Item 3', onClick: function(){ alert('item 3 clicked') }},
+		{label:'Item 4', onClick: function(){ alert('item 4 clicked') }}
+	], { w:70, align: 'bottom'})
+	
+	
+/*
+	Menu with event trigger
+*/
+	var menu3 = new Dropdown({
+		renderTo: $('#menu3'),
+		view: [
+			{label:'Item 1', val: '1', onClick: 'trigger'},
+			{label:'Item 2', val: '2', onClick: 'trigger'},
+			{label:'Item 3', val: '3', onClick: 'trigger'}
+		],
+		w:70,
+		align: 'bottom'
+	})
+
+	menu3.view.on('click', function(item, $li){
+		alert('item '+item.val+' clicked')
+	})
+</code></pre>
+	
 	</div>
 
 	<hr>
@@ -129,6 +205,14 @@ $(function() {
 	menu3.view.on('click', function(item, $li){
 		alert('item '+item.val+' clicked')
 	})
+	
+	
+	var menu = [];
+	for(var i = 0; i<=50; i++){
+		menu.push({label:'Item '+i, val:i, onClick: function(item){ alert(item.label+', value:'+item.val) }})
+	}
+	
+	$('#menu4').dropdown(menu);
 	
 	
 	

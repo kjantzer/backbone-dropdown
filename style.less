@@ -6,17 +6,6 @@
 @serif: 'Times New Roman';
 @sans-serif: 'Helvetica', 'Arial';
 
-.dark-hover-state() {
-	background: @dark;
-	color: #fff;
-	text-shadow: rgba(0,0,0,.5) 0 1px 0;
-}
-
-.red-hover-state() {
-	background: @red;
-	color: #fff;
-	text-shadow: rgba(0,0,0,.5) 0 1px 0;
-}
 
 @import 'elements.less'; // http://lesselements.com/
 @import 'lib/kjc-reusable-styles'; // https://gist.github.com/kjantzer/5436097
@@ -26,4 +15,23 @@
 // dropdowns require the element to be relative for positioning to work
 .dd {
 	position: relative;
+}
+
+
+input.search, input.search:focus, input.filter, input.filter:focus {
+	padding: 5px;
+	border: 1px solid #ccc;
+	-webkit-box-shadow: inset 1px 1px 1px rgba(0,0,0,0.1);
+	-moz-box-shadow: inset 1px 1px 1px rgba(0,0,0,0.1);
+	box-shadow: inset 1px 1px 1px rgba(0,0,0,0.1);
+	background: #fff url('src/search-icon.png') 7px center no-repeat !important;
+	-webkit-border-radius: 14px;
+	-moz-border-radius: 14px;
+	border-radius: 14px;
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	font-size: 12px;
+	padding-left: 26px;
+	outline: none;
 }
