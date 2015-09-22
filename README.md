@@ -1,44 +1,32 @@
-#Dropdown Backbone View
+# Backbone Dropdown
 
-Easily create dropdown (or popover) views for menus, inline editing, or just a simple tooltip. Has support for many locations (bottomLeft, bottom, bottomRight; on all sides)
+> Easily create dropdown views for menus, inline editing, or just a simple tooltip.
 
-![preview](http://i.imgur.com/SJvBzeN.png)
+[![Preview](http://i.imgur.com/V7jaCWZ.png)](http://kjantzer.github.io/backbone-dropdown/)
 
-### Requires
-- LESS
-- Elements.less
-- [Underscore.String.js](https://github.com/epeli/underscore.string)
+### [Demo & Documentation](http://kjantzer.github.io/backbone-dropdown/)
 
-Use
----
-#### Normal
+Dropdown is designed to be robust and extensible. It can be used independently or embedded into another plugin such as [List Controller](https://github.com/kjantzer/backbone-list-controller).
 
-    new Dropdown({
-      renderTo: $('.some-el'),
-    	view: new MyBackBoneView()
-    })
+The general idea is to display a view inline with the target element. A `Backbone.View`, `jQuery/HTML String`, or `Array` are all acceptable types of "views". An array will be converted into a DropdownMenuView.
 
-#### Change defaults
+***
 
-    new Dropdown({
-    	renderTo: $('.some-el'),
-    	view: new MyBackBoneView(),
-    	w: 300, // default width is 200px
-    	align: 'top' // default is bottomRight,
-    	closeOn: 'el' // only close when clicking "renderTo" el
-    })
-    
-#### Simple Tooltip
+### Example Use
 
-    new Dropdown({
-    	renderTo: $('.some-el'),
-    	view: 'I‘m a simple tooltip'
-    })
-    
-#### jQuery Plugin
-
-    $('.selector').dropdown('I‘m a tooltip');
-    
-    $('.selector').dropdown('I‘m a tooltip on top', {align:'top'});
-    
-    $('.selector').dropdown( (new Backbone.View()) );
+```
+$('#menu').dropdown([
+    { divider: 'My Menu'},
+    { label:'Item 1', val: 1 },
+    { label:'Item 2', val: 2 },
+    { label:'Item 3', val: 3 },
+    'divider',
+    { label:'Item 4', val: 4 },
+], {
+    w:120,
+    align: 'bottom',
+    onClick: function(item){
+        console.log(item)
+    }
+})
+```
