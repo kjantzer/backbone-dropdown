@@ -12,6 +12,7 @@
 	
 	
 	@param "view" - can be:
+		- function (which should return one of the views below)
 		- text (creates "tooltip")
 		- array (which generates a menu)
 		- Backbone.View
@@ -22,6 +23,9 @@
 		NOTE: see determineView() method for auto detecting what view should be used; add to it as you see fit
 		
 	@param "options" - see Dropdown.defaultOpts below
+	
+	
+	Dropdown.permission -> you'll want to override this method to fit your application
 		
 	
 	@author Kevin Jantzer, Blackstone Audio
@@ -46,8 +50,11 @@ var Dropdown = Backbone.View.extend({
 		alignVerticalToParent: false,
 		style: 'default',		// toolbar - DEPRECATED, use theme
 		theme: 'default',		// 'toolbar', 'select'
+		animated: true,
 		closeOn: 'body',		// body, el
 		closeOnEsc: true,
+		closeOnScroll: false,
+		actionOnEnter: false,	// will trigger "actionOnEnter" method on view when enter is pressed
 		view: null, 			// view to be rendered ( see @param "view" above for documentation)
 		trigger: 'click',		// click, dbclick, hover, delay, none (will open upon init and be removed when closed)
 		delay: 1000,			// delay duration when using trigger='delay'
@@ -55,7 +62,8 @@ var Dropdown = Backbone.View.extend({
 	},
 	
 	defaultEvents: {
-		'click': 'stopPropagation'
+		'click': 'stopPropagation',
+		'contextmenu': 'stopPropagation' // right click
 	},
 	
 	initialize: function(opts){
@@ -68,7 +76,7 @@ var Dropdown = Backbone.View.extend({
 		
 		
 		// check for required parameters
-		if( !this.options.renderTo){
+		if( !this.options.renderTo){ // TODO: change to `target`
 			console.error('Dropdown.js: You need to specify an element to "renderTo"');
 			return false;
 		}else if( !this.options.view ){
@@ -76,15 +84,11 @@ var Dropdown = Backbone.View.extend({
 			return false;
 		}
 		
-		
-		// close
-		if(this.options.closeOn == 'body'){
-			document.body.addEventListener('click', this.deferClose.bind(this), true);
-			this.el.addEventListener('click', this.stopDeferClose.bind(this), true);
-		}
-		
-		if( this.options.closeOnEsc )
-			document.body.addEventListener('keyup', this.closeOnEsc.bind(this), false);
+		// bind to `this`
+		this.deferClose = this._deferClose.bind(this)
+		this.stopDeferClose = this._stopDeferClose.bind(this)
+		this.onKeyup = this._onKeyup.bind(this);
+
 		
 		if( this.options.trigger === 'delay' )
 			this.bindDelayedTrigger();
@@ -103,7 +107,7 @@ var Dropdown = Backbone.View.extend({
 		this.view.on('dropdown:open', this.open, this);
 		
 		if( this.options.trigger === 'none' || this.options.openOnInit )
-			_.defer(this.open.bind(this));
+			_.defer(this.toggle.bind(this));
 		
 	},
 	
@@ -116,6 +120,41 @@ var Dropdown = Backbone.View.extend({
 		
 		this.$el.remove();
 	},
+
+	_bindEvents: function(){
+
+		this._unbindEvents();
+
+		// close
+		if(this.options.closeOn == 'body'){
+			document.body.addEventListener('click', this.deferClose, true);
+			document.body.addEventListener('contextmenu', this.deferClose, true);
+			this.el.addEventListener('click', this.stopDeferClose, true);
+			this.el.addEventListener('contextmenu', this.stopDeferClose, true);
+		}
+
+		// FIXME: whoops, `scrollParent` is not native...its a side effect of `VisualSearch`
+		if( this.options.closeOnScroll && this.options.renderTo.scrollParent && this.options.renderTo.scrollParent()[0] )
+			this.options.renderTo.scrollParent()[0].addEventListener('scroll', this.deferClose, true);
+
+		// watch for esc or enter key
+		if( this.options.closeOnEsc || this.options.actionOnEnter )
+			document.body.addEventListener('keyup', this.onKeyup, false);
+	},
+
+	_unbindEvents: function(){
+		
+		document.body.removeEventListener('click', this.deferClose);
+		document.body.removeEventListener('contextmenu', this.deferClose);
+		this.el.removeEventListener('click', this.stopDeferClose);
+		this.el.removeEventListener('contextmenu', this.stopDeferClose);
+		document.body.removeEventListener('keyup', this.onKeyup);
+
+		// FIXME
+		if( this.options.renderTo.scrollParent && this.options.renderTo.scrollParent()[0] )
+			this.options.renderTo.scrollParent()[0].removeEventListener('scroll', this.deferClose);
+	},
+
 	
 	unbindTrigger: function(){
 		
@@ -167,6 +206,10 @@ var Dropdown = Backbone.View.extend({
 		this.$el.addClass('style-'+this.options.style)
 		this.$el.addClass('theme-'+this.options.theme)
 		
+		if( this.options.animated )
+			this.$el.addClass('animate')
+		
+		this.options.renderTo.addClass('has-dropdown')
 		
 		// append the inner view to the dropdown
 		this.view = this.options.view;
@@ -179,15 +222,22 @@ var Dropdown = Backbone.View.extend({
 		
 		var view = this.view;
 		
-		if( _.isFunction(view) ) this.view = view = view();
+		// is the given view a function?
+		if( _.isFunction(view) ){
+			this.options.viewFn = this.view.bind(this.options.context||this);	// lets keep a link to this view function
+			this.view = view = this.options.viewFn();// and then run the function to get the view
+		}
 		
-		// if the given view is a string, then load that string with a "default dropdown view"
+		// if the given view is a string (or jQuery object), then load that string with a "default dropdown text view"
 		if(_.isString(view) || view instanceof jQuery)
-			this.view = new DropdownTextView({html:this.view});
+			this.view = new DropdownTextView(_.extend({},this.options,{html:this.view}));
 			
 		else if(_.isArray(view))
 			this.view = new DropdownMenuView(view, this.options);
 		
+		else if( (view instanceof Backbone.Model && view.has('book_id')) || (typeof Book !== 'undefined' && view instanceof Book.Record) )
+			this.view = new BSA.Views.BookOverview({id: view.id });
+
 		else if( typeof Book !== 'undefined' && view instanceof Book.Record )
 			this.view = new Popover.Views.BookPreview({model: view });
 			
@@ -196,6 +246,8 @@ var Dropdown = Backbone.View.extend({
 		
 		else if( view instanceof Backbone.Model )
 			this.view = new Popover.Views.ModelPreview({model: view});
+
+		// if no custom view was determined, then just use the Backbone.View that was given
 	},
 	
 	render: function(){
@@ -205,8 +257,7 @@ var Dropdown = Backbone.View.extend({
 	
 	stopPropagation: function(e){
 		e.stopPropagation();
-		e.stopImmediatePropagation();
-		e.preventDefault();
+		e.stopImmediatePropagation(); // note: this is jQuery thing I think, so probably don't need this...
 	},
 	
 	// toggle open and close
@@ -219,15 +270,17 @@ var Dropdown = Backbone.View.extend({
 	},
 	
 	open: function(e){
-		
+		window.dropdown = this;
 		clearTimeout(this.closeTimeout);
 		clearTimeout(this.deferCloseTimeout)
 		
-		if(e)
+		if( e && e.stopPropagation )
 			e.stopPropagation();
 		
 		if(this.isOpen) return; // don't do anything if we are already open
-	
+		
+		this._bindEvents();
+
 		this.isOpen = true;
 		this.options.renderTo.addClass('dropdown-open')
 		this.$el.addClass('open');
@@ -239,39 +292,64 @@ var Dropdown = Backbone.View.extend({
 	
 	close: function(e){
 	
-		if(!this.isOpen) return; // don't do anything if we are already closed
+		if(!this.isOpen || (e && e.cancelBubble)) return; // don't do anything if we are already closed
 	
+		this._unbindEvents();
+
 		this.isOpen = false;
 		this.options.renderTo.removeClass('dropdown-open')
 		this.$el.removeClass('open');
 		this.trigger('dropdown:closed');
 		this.view.trigger('dropdown:closed'); // tell the inner view we've closed
 		
-		if( this.options.trigger === 'none' )
+		if( this.options.trigger === 'none' ){
+			this.options.renderTo.removeClass('has-dropdown')
 			_.defer(this.remove.bind(this))
+		}
+
+		if( this.options.onClose )
+			this.options.onClose()
+		
+		if( e && e.stopPropagation )
+			e.stopPropagation();
 	},
 	
-	closeOnEsc: function(e){
-		if(e.which == 27) this.deferClose();
+	_onKeyup: function(e){
+		if( !this.isOpen ) return;
+
+		if( this.options.closeOnEsc && e.which == 27){
+			this.deferClose(e);
+			e.stopPropagation();
+		}else if( this.options.actionOnEnter && e.which == 13){
+			this.actionOnEnter(e);
+			e.stopPropagation();
+		}
+	},
+
+	actionOnEnter: function(e){
+		if( this.view.actionOnEnter )
+			this.view.actionOnEnter(e); // view must have an "actionOnEnter" method for this to work
 	},
 	
-	deferClose: function(){
-		this.deferCloseTimeout = setTimeout(this.close.bind(this), 0);
+	_deferClose: function(e){
+		this.deferCloseTimeout = setTimeout(this.close.bind(this, e), 0);
 	},
 	
-	stopDeferClose: function(e){
+	_stopDeferClose: function(e){
 		clearTimeout(this.deferCloseTimeout)
 	},
 	
 	adjustPosition: function(){
 		
-		if(this.options.align === 'left' || this.options.align === 'right')
+		var align = this.options.align;
+		
+		if(align === 'left' || align === 'right')
 			this.alignVerticalMiddle();
 			
-		else if(this.options.align === 'top' || this.options.align === 'bottom')
+		else if(align === 'top' || align === 'bottom')
 			this.alignHorizontalMiddle();
 		
-		else if(this.options.align === 'auto')
+		else if(align === 'auto')
 			this.autoAlign();
 			
 		else
@@ -279,7 +357,66 @@ var Dropdown = Backbone.View.extend({
 			
 		if( this.options.alignVerticalToParent ){
 			this.el.style.top = this.options.renderTo[0].offsetTop;
+			
+			if( align == 'auto' ){
+				this.el.style.top = this.options.renderTo[0].offsetTop 
+									+ this.options.renderTo[0].offsetHeight
+									- this.options.renderTo[0].parentElement.scrollTop;
+			}
+			else if( align == 'rightBottom'
+					|| this.options.align == 'leftBottom' ){
+				this.el.style.top = this.options.renderTo[0].offsetTop 
+									- this.options.renderTo[0].parentElement.scrollTop;
+			}
 		}
+		
+		// WIP
+		if( this.options.moveToBody ){
+			var f = this.el.getBoundingClientRect();
+			document.body.appendChild(this.el);
+			this.el.style.position = 'absolute';
+			this.el.style.zIndex = 10000;
+			this.el.style.left = f.left;
+			this.el.style.top = f.top;
+		}
+		
+		// this logic is flawed, but better than nothing for now
+		if( this.isCovered() ){
+			
+			if( align == 'top' ) this._switchAlignment('top', 'bottom')
+			else if( align == 'topRight' ) this._switchAlignment('topRight', 'bottomRight')
+			else if( align == 'topLeft' ) this._switchAlignment('topLeft', 'bottomLeft')
+			
+			else if( align == 'bottom' ) this._switchAlignment('bottom', 'top')
+			else if( align == 'bottomRight' ) this._switchAlignment('bottomRight', 'topRight')
+			else if( align == 'bottomLeft' ) this._switchAlignment('bottomLeft', 'topLeft')
+			
+		}
+		
+		
+	},
+	
+	_switchAlignment: function(before, after){
+		this.el.classList.remove('align-'+before)
+		this.el.classList.add('align-'+after)
+	},
+	
+	// is the dropdown covered by another element?
+	isCovered: function(){
+		var f = this.el.getBoundingClientRect();
+		var onTopEl;
+		
+		switch(this.options.align){
+			case 'top': onTopEl = document.elementFromPoint(f.left+(f.width/2), f.top+5); break;
+			case 'topRight': onTopEl = document.elementFromPoint(f.right-5, f.top+5); break;
+			case 'topLeft': onTopEl = document.elementFromPoint(f.left+5, f.top+5); break;
+			
+			case 'bottom': onTopEl = document.elementFromPoint(f.left+(f.width/2), f.bottom-5); break;
+			case 'bottomRight': onTopEl = document.elementFromPoint(f.right-5, f.bottom-5); break;
+			case 'bottomLeft': onTopEl = document.elementFromPoint(f.left+5, f.bottom-5); break;
+		}
+		
+		return onTopEl !== this.el && !this.el.contains(onTopEl)
 	},
 	
 	alignVerticalMiddle: function(){
@@ -359,15 +496,24 @@ var Dropdown = Backbone.View.extend({
 
 
 
-
-
-
 var DropdownTextView = Backbone.View.extend({
 
-	className: 'dropdown-text-view',
+	className: 'dropdown-text-view standard-text',
 	
 	initialize: function(){
-	
+		this.doRender();
+	},
+
+	render: function(){
+
+		// if the view given was a function, call that function on each render for dynamic content
+		if( this.options.viewFn ){
+			this.options.html = this.options.viewFn();
+			this.doRender();
+		}
+	},
+
+	doRender: function(){
 		var html = this.options.html;
 	
 		if( !(html instanceof jQuery ) && !/^</.test(html) )
@@ -378,11 +524,16 @@ var DropdownTextView = Backbone.View.extend({
 })
 
 
+
 var DropdownMenuView = Backbone.View.extend({
 
 	tagName: 'div',
 	
-	className: 'dropdown-menu-view',
+	className: 'dropdown-menu-view no-selection',
+
+	context: function(){
+		return this.options.context || this;
+	},
 	
 	initialize: function(menu, opts){
 		
@@ -390,30 +541,88 @@ var DropdownMenuView = Backbone.View.extend({
 		
 		this.options = _.extend({
 		
+			collection: null,	// used to render the menu
+			autoFetch: false,	// will fetch the collection and then render the menu
+			noResultsMsg: 'No Results',
+			selected: null,			// set to value of one of the menu items and it will be selected
 			search: true,			// turns search on if more values than threshold
 			searchMinScore: .7,
-			searchThreshold: 20
+			searchThreshold: 20,
+			closeOnClick: true
 			
-		}, opts || {});
+		}, opts || {});	
+
+		if( this.options.collection && _.isFunction(this.options.collection) )
+			this.options.collection = this.options.collection.call(this.context())
+
+		if( this.options.viewFn )
+			this.menu = this.options.viewFn();
 		
 		this.$el.addClass('theme-'+this.options.theme)
 		
-		if( this.options.search != false && menu.length > this.options.searchThreshold ){
-			$('<div class="search-bar"></div>')
-				.appendTo(this.$el)
-				.append( this.$search = $('<input type="text" class="search" placeholder="Filter...">').on('keyup', this.onSearch.bind(this)) )
-		}
-		
 		this.$ul = $('<ul class="dropdown-menu-view"></ul>').appendTo(this.$el);
 		
+		this.toggleSearch();
+
 		this.addItems();
-		
 	},
 	
 	render: function(){
+
+		if( this.options.collection && this.options.autoFetch ){
+
+			//var coll = _.isFunction(this.options.collection) ? this.options.collection.call(this.context()) : this.options.collection;
+			var coll = this.options.collection;
+			
+			if( coll.length == 0)
+				this.$ul.html('<p style="padding: 10px; word-break: normal;">Loading...</p>')
+			else
+				this._render();
+			
+			//if( coll.length == 0) // might want to remove this later (when caching is in place)
+				coll.fetch({update: true, success: this._render.bind(this)})
+		
+		}else{
+			this._render();
+		}
+		
+	},
+
+	_render: function(){
+
+		if( this.options.viewFn ){
+			this.menu = this.options.viewFn();
+
+			if( !_.isArray(this.menu) ){
+				
+				if( this.menu )
+					this.options.noResultsMsg = this.menu;
+
+				this.menu = [];
+			}
+
+			this.toggleSearch();
+			this.addItems();
+		}
+
 		this.delegateEvents();
-		_.defer(this.focus.bind(this));
+		setTimeout(this.focus.bind(this),200);
 		return this;
+
+	},
+
+	toggleSearch: function(){
+		if( this.options.search != false && this.menu.length > this.options.searchThreshold ){
+			if( !this.$searchView ){
+				this.$searchView = $('<div class="search-bar"></div>')
+					.prependTo(this.$el)
+					.append( this.$search = $('<input type="text" class="search" placeholder="Filter...">').on('keyup', this.onSearch.bind(this)) )
+			}
+		}
+		else if( this.$searchView ){
+			this.$searchView.remove();
+			this.$searchView = null;
+		}
 	},
 	
 	onSearch: function(e){
@@ -427,7 +636,11 @@ var DropdownMenuView = Backbone.View.extend({
 	
 	addItems: function(){
 		this.$ul.html('');
-		_.each(this.menu, this.addItem, this);
+
+		if( this.menu && this.menu.length > 0)
+			_.each(this.menu, this.addItem, this);
+		else
+			this.$ul.html('<p style="padding: 10px; word-break: normal;">'+this.options.noResultsMsg+'</p>')
 	},
 	
 	addItem: function(item){
@@ -448,45 +661,98 @@ var DropdownMenuView = Backbone.View.extend({
 		
 		item = _.extend({
 			label: 'No Label',
+			description: '',
+			title: '',
 			className: '',
+			dataAttrs: null,	// key/value object to be set as html5 data attributes
 			permission: false // dont need permission... add "key" to limit (see User.can())
 		},item)
 		
 		// user doesn't have permission to click this menu
-		if( item.permission && User.cannot(item.permission) )
+		if( item.permission && !Dropdown.permission(item.permission) )
 			return;
 		
 		var className = item.className;
-		
+		var iconClassName = item.icon ? 'icon-'+item.icon : '';
+
 		if( this.options.theme == 'select' )
-			className += ' icon-plus';
+			iconClassName += ' icon-plus';
+
+		var selected = this.options.selected; selected =_.isFunction(selected) ? selected.call(this.context()) : selected;
+
+		if( item.selected === true
+		|| (selected !== null
+		&& selected !== undefined
+		&& (selected == item.val ||  (_.isArray(selected) &&_.contains(selected, item.val)))) )
+			className += 'selected';
 		
-		var $li = $('<li class="'+className+'">'+item.label+'</li>').appendTo($el);
+		var $li = $('<li data-val="'+item.val+'" class="'+className+'" title="'+item.title+'">\
+						<span class="'+iconClassName+'">'+item.label+'\
+						<span class="description">'+item.description+'</span>'+
+						(item.options?'<span class="options badge gray-50 icon-only icon-dot-3"></span>':'')
+						+'</span>\
+					</li>').appendTo($el);
+
+
+		if( item.options ){
+			item.options.renderTo = $li.find('.options');
+			item.options.align = item.options.align || 'bottomLeft';
+			item.options.w = item.options.w || 120;
+			item.options.context = item.options.context || this.context();
+			new Dropdown(item.options);
+		}
 		
-		if(item.icon)
-			$li.addClass('icon-'+item.icon);
+		if( item.dataAttrs )
+			_.each(item.dataAttrs, function(val, key){
+				$li.attr('data-'+key, val);
+			})
 			
 		if(item.border)
 			$li.css('border-right', 'solid 4px '+this.borderColor(item.border));
 		
-		if( item.onClick || this.options.onClick )
+		if( item.input )
+			item.dropdown = {
+				view: new DropdownMenuInputSelectView({
+					//onClick: item.onClick || this.options.onClick,
+					onClick: this._determineOnClickMethod(item),
+					item: item,
+					parent: this.options
+				}),
+				w: item.input.w || 120,
+				align: item.input.align || 'rightBottom'
+			}
+		else if( (item.onClick || this.options.onClick) && !item.dropdown )
 		$li.click(_.bind(function(){
 			
-			if(item.onClick === 'trigger')
+			if(item.onClick === 'trigger'){ // this onClick is deprecated (haven't used it for a while and dont think its useful anymore)
 				this.trigger('click', item, $li);
-			else if( item.onClick )
-				item.onClick(item, $li);
-			else if( this.options.onClick )
-				this.options.onClick(item, $li);
+
+			}else{
+
+				var fn = this._determineOnClickMethod(item);
+
+				if( fn )
+					fn(item, $li, this.options.opts)	
+			}
 			
-			this.trigger('dropdown:close')
+			if( this.options.closeOnClick && item.closeOnClick !== false )
+				this.trigger('dropdown:close')
+			else
+				this.render();	 
 			
 		},this));
 		
 		
 		if( item.dropdown && item.dropdown.view){
 			item.dropdown.alignVerticalToParent = true;
+			item.dropdown.context = item.dropdown.context || this.context();
 			$li.dropdown(item.dropdown.view, item.dropdown);
+		}
+		
+		if( item.uploader ){
+			item.uploader.button = $li;
+			$li.css('position','relative');
+			item.uploader.obj = new Uploader(item.uploader);
 		}
 		
 	},
@@ -496,9 +762,9 @@ var DropdownMenuView = Backbone.View.extend({
 		var $el = this.$ul ? this.$ul : this.$el;
 		
 		if( item.divider )
-			$('<li class="label-divider">'+item.divider+'</li>').appendTo($el);
+			$('<li class="label-divider clear">'+item.divider+'</li>').appendTo($el);
 		else
-			$('<li class="divider"></li>').appendTo($el);
+			$('<li class="divider clear"></li>').appendTo($el);
 	},
 	
 	borderColor: function(color){
@@ -511,9 +777,167 @@ var DropdownMenuView = Backbone.View.extend({
 			default: return color; break
 			
 		}
-	}
+	},
+
+	// could leverage `_.determineFn()` but then it would be a dependency
+	_determineOnClickMethod: function(item){
+
+		var fn = item.onClick || this.options.onClick;
+		var ctx = this.context();
+
+		// look for function name on the context
+		if( _.isString(fn) ){
+
+			if( !ctx ){
+				console.error('Could not bind onClick “'+fn+'”; please provide a context')
+				fn = null;
+
+			}else if( ctx[fn] && _.isFunction(ctx[fn]) ){
+				fn = ctx[fn].bind(ctx);
+			
+			}else{
+				console.error('Method “'+fn+'” does not exist on context:', ctx)
+				fn = null;
+			}
+
+		}else if( fn && _.isFunction(fn) ){
+			fn = fn.bind(ctx)
+
+		}else{
+			fn = null;
+		}
+
+		return fn;
+	},
 	
 })
+
+var DropdownMenuInputSelectView = Backbone.View.extend({
+
+	className: 'date-selector padded',
+
+	events: {
+		'click .btn': 'submitVal',
+		'keypress input': 'onKeyPress'
+	},
+
+	format: {
+		'string': {
+			'placeholder': '',
+			'pattern': '.*'
+		},
+		'integer': {
+			'placeholder': '',
+			'pattern': '^[0-9]*$'
+		},
+		'float': {
+			'placeholder': '',
+			'pattern': '^[0-9\.]*$'
+		},
+		'date': {
+			'placeholder': 'YYYY-MM-DD',
+			'pattern': '^[0-9]{4}-[0-1]?[0-9]{1}-[0-9]{1,2}$'
+		},
+		'month': {
+			'placeholder': 'YYYY-MM',
+			'pattern': '^[0-9]{4}-[0-1]?[0-9]{1}$',
+		},
+		'year': {
+			'placeholder': 'YYYY',
+			'pattern': '^[0-9]{4}$'
+		}
+	},
+
+	initialize: function(){
+		
+		this.opts = _.extend({
+
+			title: '',
+			footer: '',
+			val: '',
+			placeholder: '',
+			format: 'date', // month, year
+			range: false,
+			btn: false		// "select" button
+
+		}, this.options.item.input)
+	},
+
+	render: function(){
+		
+		this.$el.html('');
+
+		var format = this.format[this.opts.format];
+		var placeholder = this.opts.placeholder || format.placeholder;
+
+		if( this.opts.title )
+			this.$el.append('<label class="dropdown-input-title">'+this.opts.title+'</label>')
+
+		var val1 = this.opts.val;
+		var val2 = '';
+
+		if( this.opts.range && _.isArray(this.opts.val) && this.opts.val.length == 2){
+			val1 = this.opts.val[0]
+			val2 = this.opts.val[1]
+		}
+
+		this.$input = $('<input type="text" style="width: 100%;" placeholder="'+placeholder+'" value="'+val1+'">').appendTo(this.$el)
+
+		if( this.opts.range == true )
+			this.$input2 = $('<input type="text" style="width: 100%;" placeholder="'+placeholder+'" value="'+val2+'">').appendTo(this.$el)
+
+		setTimeout(this.focus.bind(this), 200)
+
+		if( this.opts.footer )
+			this.$el.append('<div class="dropdown-input-footer">'+this.opts.footer+'</div>')
+
+		if( this.opts.btn )
+			this.$el.append('<p class="label-divider footer clear clearfix"><a class="right btn primary">'
+									+(typeof this.opts.btn == 'string' ? this.opts.btn : 'Select')+'</a></p>')
+	},
+
+	focus: function(){
+		this.$input.focus();
+	},
+
+	onKeyPress: function(e){
+		if( e.which == 13 ) // on enter
+			this.submitVal(); 
+	},
+
+	submitVal: function(){
+		
+		var pattern = new RegExp(this.format[this.opts.format].pattern)
+		var val = this.$input.val();
+
+		// make sure user inputed a month
+		if( !pattern.test(val) )
+			return this.$input.bounce();
+
+		if( this.opts.range == true ){
+			var val2 = this.$input2.val();
+
+			if( !pattern.test(val2) )
+				return this.$input2.bounce();
+		}
+
+		if( val2 )
+			this.options.item.val = [val, val2]; // set this so the value will be used
+		else
+			this.options.item.val = val; // set this so the value will be used
+		
+		this.options.onClick(this.options.item)
+	}
+})
+
+
+/*
+	Override this to fit your application
+*/
+Dropdown.permission = function(permission){
+	return User.can(permission);
+}
+
 
 
 var Popover = {
@@ -548,6 +972,7 @@ Popover.Views.ModelPreview = Backbone.View.extend({
 	
 })
 
+// !! DEPRECATED - see BSA.Views.BookOverview
 Popover.Views.BookPreview = Popover.Views.ModelPreview.extend({
 
 	className: 'model-preview book-preview',
@@ -630,6 +1055,13 @@ $.fn.dropdown = function( view, opts ) {
 };
 
 
+$.fn.dropdownOpen = function() {  
+	var $el = $(this);
+	return $el.data('dropdown') && $el.data('dropdown').isOpen;
+};
+
+
+
 /*
 	Popover is just a dropdown with some defaults
 */
@@ -639,7 +1071,7 @@ $.fn.popover = function( view, opts ) {
 		
 		trigger: 'delay',
 		align: 'auto',
-		w: 350
+		w: 440
 		
 	}, opts || {});
 
@@ -649,7 +1081,7 @@ $.fn.popover = function( view, opts ) {
 
 
 /*
-	Book Preview Popover
+	Book Preview Popover - deprecated (just send book model to `popover`)
 */
 $.fn.bookPreviewPopover = function( idOrModel, opts ) {  
 

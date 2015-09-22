@@ -1,0 +1,35 @@
+{
+  "name": "backbone-dropdown",
+  "version": "1.0.0",
+  "description": "Extensible dropdown component for Backbone.js apps.",
+  "main": "index.html",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kjantzer/backbone-dropdown"
+  },
+  "keywords": [
+    "dropdown",
+    "tooltip",
+    "menu",
+    "select"
+  ],
+  "author": "Kevin Jantzer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kjantzer/backbone-dropdown/issues"
+  },
+  "homepage": "https://github.com/kjantzer/backbone-dropdown",
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-less": "~0.11.0",
+    "grunt-contrib-watch": "~0.6.1",
+    "jit-grunt": "~0.7.0"
+  },
+  "dependencies": {
+    "backbone": "0.9.10",
+    "basic-buttons": "^1.0.0",
+    "jquery": "^2.1.4",
+    "underscore": "^1.8.3"
+  }
+}

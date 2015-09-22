@@ -1,7 +1,8 @@
 <html>
 <head>
 
-<title>Backbone.js Dropdown View</title>
+<title>Dropdown Component for Backbone.js Apps</title>
+<meta charset="utf-8"></meta>
 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -15,238 +16,247 @@
 </script>
 
 <!-- Backbone.js Dependencies -->
-<script src="lib/jquery.min.js"></script>
-<script src="lib/underscore.min.js"></script>
-<script src="lib/backbone.min.js"></script>
+<script src="node_modules/jquery/dist/jquery.min.js"></script>
+<script src="node_modules/underscore/underscore-min.js"></script>
+<script src="node_modules/backbone/backbone-min.js"></script>
 
 <script src="lib/LiquidMetal.js"></script> <!-- scoring algorithm for searching -->
 
-<!-- Bootstrap 3 - http://getbootstrap.com -->
-<link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-
-<!-- Panel View script -->
+<!-- demo styles which imports dropdown styles -->
 <link href="style.css" rel="stylesheet" type="text/css">
-<script src="src/Dropdown.js"></script>
 
+<script src="src/Dropdown.js"></script>
+<script type="text/javascript" src="demo.js"></script>
 </head>
 
 <body>
 
-<div class="navbar">
-  <div class="container">
-
-   <a class="navbar-brand" href="#">Blackstone UI Components</a>
-
-    <ul class="nav navbar-nav">
-	  <li class=""><a href="http://kjantzer.github.io/backbonejs-list-controller-view/">List Controller</a></li>
-	  <li class=""><a href="http://kjantzer.github.io/backbonejs-panel-view/">Panel</a></li>
-	  <li class="active"><a href="http://kjantzer.github.io/backbonejs-dropdown-view/">Dropdown</a></li>
-	  <li class=""><a href="http://kjantzer.github.io/backbonejs-modal-view/">Modal</a></li>
-	  <li class=""><a href="http://kjantzer.github.io/backbonejs-model-editor-view/">Model Editor</a></li>
-	  <li class=""><a href="http://kjantzer.github.io/basic-buttons/">Basic Buttons</a></li>
-	</ul>
-
-    
-  </div><!-- /.container -->
-</div><!-- /.navbar -->
-
 <a href="https://github.com/kjantzer/backbonejs-dropdown-view"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
 
-<div class="container">
-	<div class="col-lg-6 col-lg-offset-3">
-	
-	<h1>Backbone.js Dropdown View</h1>
-	<p>Easily create dropdown (or popover) views for menus, inline editing, or just a simple tooltip. Has support for many locations (bottomLeft, bottom, bottomRight; on all sides)</p>
-	<br>
-	
-	
-	<div id="demos" class="clearfix panel">
-		
-		<p>A simple <a id="simple-tooltip" class="dd">tooltip</a></p>
-		
-		<hr>
-		
-		<p>Load a <code>Backbone.View</code> into a dropdown: <a id="myaccount" class="dd">My Account</a></p>
-		
-		<hr>
-		
-		<a id="menu" class="btn btn-default dd">Menu</a>
-		<a id="menu2" class="btn btn-default dd">Menu with Dividers</a>
-		<a id="menu3" class="btn btn-default dd">Menu with Event Triggers</a>
-		<a class="btn btn-default dd" onclick="$(this).dropdown('This loaded programatically', {trigger: 'none', align: 'topLeft'})">Programatic</a>
-		
-		<br><br>
-		
-		<a id="menu4" class="btn btn-default dd">Use as a select</a>
-		
-	</div>
-	
-	<h3>How to use</h3>
-	<p>Creating a Dropdown is very simple.</p>
-	<div class="clearfix panel">
-	
-<pre><code>
-/*
-	Simple Tooltip
-*/
-	$('#simple-tooltip').dropdown(
-				'This is a tooltip', 
-				{align: 'topRight', 
-				trigger: 'hover'});
-	
-	
-/*
-	Menu
-*/
-	$('#menu').dropdown([
-		{
-			label:'Item 1', 
-			onClick: function(){ 
-				alert('item 1 clicked') 
-			}
-		},{
-			label:'Item 2',
-			onClick: function(){
-				alert('item 2 clicked')
-			}
-		},{
-			label:'Item 3', 
-			onClick: function(){
-				alert('item 3 clicked')
-			}
-		}
-	], { w:70, align: 'bottom'})
-	
-	
-/*
-	Menu with Dividers
-*/
-	$('#menu2').dropdown([
-		{'divider': 'Options'},
-		{label:'Item 1', onClick: function(){ alert('item 1 clicked') }},
-		{label:'Item 2', onClick: function(){ alert('item 2 clicked') }},
-		'divider',
-		{label:'Item 3', onClick: function(){ alert('item 3 clicked') }},
-		{label:'Item 4', onClick: function(){ alert('item 4 clicked') }}
-	], { w:70, align: 'bottom'})
-	
-	
-/*
-	Menu with event trigger
-*/
-	var menu3 = new Dropdown({
-		renderTo: $('#menu3'),
-		view: [
-			{label:'Item 1', val: '1', onClick: 'trigger'},
-			{label:'Item 2', val: '2', onClick: 'trigger'},
-			{label:'Item 3', val: '3', onClick: 'trigger'}
-		],
-		w:70,
-		align: 'bottom'
-	})
+<header>
+    
+    <h1>
+        Dropdown
+    </h1>
+    
+    <h3>
+        Easily create dropdown views for menus, inline editing, or just a simple tooltip.
+    </h3>
+    
+    <p style="text-align:center">
+        <a id="header-demo" class="button dd">Click Me</a>
+    </p>
+    
+    <script>
+    $('#header-demo').dropdown([
+        { label:'Edit'},
+        { label:'View Options', dropdown: {
+            view: ['Option 1', 'Option 2'],
+            w: 120,
+            align: 'rightBottom'
+        }},
+        'divider',
+        { label:'Delete', }
+    ], {
+        w:160,
+        align: 'bottom',
+    })</script>
+    
+</header>
 
-	menu3.view.on('click', function(item, $li){
-		alert('item '+item.val+' clicked')
-	})
-</code></pre>
-	
-	</div>
+<section>
 
-	<hr>
-	
-	<small>Built by Kevin Jantzer, Blackstone Audio Inc.</small>
-	
-	</div>
-</div>
-
-<script type="text/javascript">
-$(function() {
-
-/*
-	Simple Tooltip
-*/
-	$('#simple-tooltip').dropdown('This is a tooltip', {align: 'topRight', trigger: 'hover'});
-	
-	
-/*
-	Menu
-*/
-	$('#menu').dropdown([
-		{label:'Item 1', onClick: function(){ alert('item 1 clicked') }},
-		{label:'Item 2', onClick: function(){ alert('item 2 clicked') }},
-		{label:'Item 3', onClick: function(){ alert('item 3 clicked') }}
-	], { w:70, align: 'bottom'})
-	
-	
-/*
-	Menu with Dividers
-*/
-	$('#menu2').dropdown([
-		{'divider': 'Options'},
-		{label:'Item 1', onClick: function(){ alert('item 1 clicked') }},
-		{label:'Item 2', onClick: function(){ alert('item 2 clicked') }},
-		'divider',
-		{label:'Item 3', onClick: function(){ alert('item 3 clicked') }},
-		{label:'Item 4', onClick: function(){ alert('item 4 clicked') }}
-	], { w:70, align: 'bottom'})
-	
-	
-/*
-	Menu with event trigger
-*/
-	var menu3 = new Dropdown({
-		renderTo: $('#menu3'),
-		view: [
-			{label:'Item 1', val: '1', onClick: 'trigger'},
-			{label:'Item 2', val: '2', onClick: 'trigger'},
-			{label:'Item 3', val: '3', onClick: 'trigger'}
-		],
-		w:70,
-		align: 'bottom'
-	})
-
-	menu3.view.on('click', function(item, $li){
-		alert('item '+item.val+' clicked')
-	})
-	
-	
-	var menu = [];
-	for(var i = 0; i<=50; i++){
-		menu.push({label:'Item '+i, val:i, onClick: function(item){ alert(item.label+', value:'+item.val) }})
-	}
-	
-	$('#menu4').dropdown(menu);
-	
-	
-	
-/*
-	Backbone View loaded into Dropdown
-*/
-	var MyAccount = Backbone.View.extend({
-		
-		initialize: function(){
-			this.$el.css('padding', '15px');
-		},
-		
-		render: function(){
-		
-			
-			this.$el.html('<h5>My Account</h5><p>This is a backbone view loaded inside of a dropdown.<br><br><a class="dd">Click here</a> to see a nested dropdown view</p>');
-			
-			this.$('a').dropdown("A nested dropdown. You can have multiple nested dropdowns. But dont't get too crazy or your users may not be very happy ;)");
-			
-			return this;
-		}
-		
-	}) 
-	
-	var myAccount = new MyAccount();
-	
-	$('#myaccount').dropdown(myAccount, {w: 300})
-	
-
+    <h1>Overview</h1>
+    
+    <p><b>Version 1.0.0</b></p>
+    
+    <p>Dropdown is designed to be robust and extensible. It can be used independently or embedded into another plugin such as <a href="https://github.com/kjantzer/backbone-list-controller">List Controller</a>.</p>
+    
+    <p>The general idea is to display a view inline with the target element. A <code>Backbone.View</code>, <code>jQuery/HTML String</code>, or <code>Array</code> are all acceptable types of "views". An array will be converted into a <code>DropdownMenuView</code>.</p>
+    
+    <hr>
+    
+    <h1>General Use</h1>
+    
+    <p><b>Vanilla</b></p>
+<pre>
+new Dropdown({
+    
+    // required
+    renderTo: $("#my-button"),
+    view: null,
+    
+    // options
+    w: 200,
+    trigger: 'click',
+    align: 'bottomRight',
+    autoCenter: false,
+    theme: 'default',
+    closeOnEsc: true,
+    delay: 1000
 });
-</script>
+</pre>
+
+    <p><b>jQuery</b></p>
+    
+<pre>
+// jQuery
+$("#my-button").dropdown(view, opts);
+</pre>
+    
+    <hr>
+    
+    <h1>Menu <code>Array</code></h1>
+    
+    <p>This is the most powerful view in Dropdown with many different features such as nesting, dividers, filtering, icons, multiple action events, and more. See the options documentation for details.</p>
+    
+    <p><a id="menu" class="button button-default dd">Open Menu</a></p>
+    
+    <script>
+    $('#menu').dropdown([
+        { divider: 'My Menu'},
+        { label:'Item 1', val: 1 },
+        { label:'Item 2', val: 2 },
+        { label:'Item 3', val: 3 },
+        'divider',
+        { label:'Item 4', val: 4 },
+    ], {
+        w:120,
+        align: 'bottom',
+        onClick: function(item){
+            alert(item.label)
+        }
+    })
+    </script>
+    
+<pre>
+$('#menu').dropdown([
+    { divider: 'My Menu'},
+    { label:'Item 1', val: 1 },
+    { label:'Item 2', val: 2 },
+    { label:'Item 3', val: 3 },
+    'divider',
+    { label:'Item 4', val: 4 },
+], {
+    w:120,
+    align: 'bottom',
+    onClick: function(item){
+        console.log(item)
+    }
+})
+</pre>
+        
+        <hr>
+        
+        <h1>Backbone View <code>Backbone.View</code></h1>
+        
+        <p>Dropdown can be used as a thin display wrapper for any Backbone view. Once the view has been initialized, pass it to dropdown as the <code>view</code></p>
+        
+        <p><a id="myaccount" class="button dd">My Account</a></p>
+        
+        <script>
+        var MyAccount = Backbone.View.extend({
+    		
+    		attributes:{style: 'padding: .5em 1em;'},
+    		
+    		render: function(){
+    			this.$el.html('<h2>My Account</h2><p>This is a backbone view loaded inside of a dropdown.<br><br><a class="dd">Click here</a> to see a nested dropdown view</p>');
+    			this.$('a').dropdown("A nested dropdown. You can have multiple nested dropdowns. But dont't get too crazy or your users may not be very happy ;)");
+    			
+    			return this;
+    		}
+    	}) 
+    	
+    	var myAccount = new MyAccount();
+    	
+    	$('#myaccount').dropdown(myAccount, {w: 300})
+        </script>
+        
+<pre><xmp>
+var MyAccount = Backbone.View.extend({
+    
+    attributes:{style: 'padding: .5em 1em;'},
+    
+    render: function(){
+        this.$el.html('<h2>My Account</h2><p>This is a backbone view loaded inside of a dropdown.<br><br>
+            <a class="dd">Click here</a> to see a nested dropdown view</p>');
+        this.$('a').dropdown("A nested dropdown. You can have multiple nested dropdowns.
+        But dont't get too crazy or your users may not be very happy ;)");
+        return this;
+    }
+}) 
+
+var myAccount = new MyAccount();
+
+$('#myaccount').dropdown(myAccount, {w: 300})
+</xmp></pre>
+
+    <br>
+    <p>Each time the dropdown is opened, <code>myAccount.render()</code> will be called.</p>
+        
+        
+    
+    <hr>
+    
+    <h1>Text Tooltip <code>String/jQuery</code></h1>
+    
+    <p>Dropdown can also be used as a simple <a id="simple-tooltip" class="dd">tooltip</a>.</p>
+    
+    <script>
+    $('#simple-tooltip').dropdown('This is a tooltip', {
+        align: 'topRight', 
+        trigger: 'hover'
+    });
+    </script>
+    
+<pre>
+$('#simple-tooltip').dropdown('This is a tooltip', {
+    align: 'topRight', 
+    trigger: 'hover'
+});
+</pre>
+
+    <br>
+    <p>This <a id="simple-tooltip-dynamic" class="dd">tooltip</a> will be dynamically generated each time it opens.</p>
+    
+    <script>
+    $('#simple-tooltip-dynamic').dropdown(function(){
+        return 'This is dynamic: '+(new Date).toString();
+    }, {
+        align: 'topRight', 
+        w: 500,
+        trigger: 'hover'
+    });
+    </script>
+    
+<pre>
+$('#simple-tooltip-dynamic').dropdown(function(){
+    return 'This is dynamic: '+(new Date).toString();
+}, {
+    align: 'top',
+    w: 220, 
+    trigger: 'hover'
+});
+</pre>
+
+    <hr>
+    
+    <h1>Options</h1>
+
+    <p>Soon.</p>
+
+    <hr>
+    
+    <h1>License</h1>
+    
+    <p>MIT © <a href="http://kevinjantzer.com">Kevin Jantzer</a></p>
+
+
+    <hr>
+    
+    <small>Built by <a href="http://kevinjantzer.com">Kevin Jantzer</a>, <a href="http://blackstoneaudio.com">Blackstone Audio Inc.</a></small>
+    
+</section>
 
 </body>
 </html>

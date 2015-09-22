@@ -1,49 +1,99 @@
 /*
 	Dropdown - dropdown view for Backbone
 */
+@charset "UTF-8";
 
 @dropdown-arrow-offset: 5px;
 @dropdown-max-height: 400px;
+@dropdown-animation-speed: 120ms;
+@dropdown-animation-offset: 10px;
+@dropdown-animation-scale: .95;
+
+.tether-element, .tether-element:after, .tether-element:before, .tether-element *, .tether-element *:after, .tether-element *:before {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
 
 div.dropdown {
 	cursor: default;
 	position: absolute;
-	z-index: 10;
+	z-index: 50; // changed from 10 so date input inside dropdown inside sheeview toolbar would work
 	top: 0;
 	left: 0;
+	white-space: normal;
 	background: #fff;
 	border: solid 1px #bbb;
 	.box-shadow(#999 0 1px 3px);
 	width: 200px;
-	display: none !important;
+	//display: none !important;
+	visibility: hidden !important;
 	min-height: 20px;
 	max-height: @dropdown-max-height;
-	
-	font-size: 14px;
+
+	font-family: HelveticaNeue, Helvetica, Calbri, sans-serif;
+	//font-size: 14px; // test this in the Catalog
+    font-size: 1rem;
 	line-height: 1.1em;
 	font-weight: normal;
-	//text-shadow: rgba(255,255,255,.5) 0 1px 0;
+	text-shadow: none;
 	text-align: left;
 	color: #444;
 	text-transform: none;
 	.rounded(3px);
+    
+    // make sure menu is selectable (in case parent el is set to no selectable)
+    -webkit-touch-callout: initial;
+	-webkit-user-select: initial;
+	-khtml-user-select: initial;
+	-moz-user-select: initial;
+	-ms-user-select: initial;
+	user-select: initial;
+
+	&.tether-out-of-bounds-top,
+	&.tether-out-of-bounds-bottom {
+		display: none;
+	}
+
+	&.open {
+		//display: block !important;
+		visibility: visible !important;
+	}
 	
-	
-	&.open { display: block !important; }
-	
-	
+	&.animate {
+		// messes with tether.js :(
+		// -webkit-transition-duration: @dropdown-animation-speed;
+		//    -moz-transition-duration: @dropdown-animation-speed;
+		//    	-ms-transition-duration: @dropdown-animation-speed;
+		//    		transition-duration: @dropdown-animation-speed;
+		
+		-webkit-transition-property: opacity, visibility, -webkit-transform;
+		   -moz-transition-property: opacity, visibility, -moz-transform;
+		   	-ms-transition-property: opacity, visibility, -ms-transform;
+		   		transition-property: opacity, visibility, transform;
+		
+		opacity: 0;
+	}
+
+
 	// ALIGN BOTTOM ------------------------------------------------------------------------
 	&.align-bottom,
 	&.align-bottomLeft,
 	&.align-bottomRight {
 		top: 100%;
 		margin-top: 10px;
+		
+		&.animate {
+			-webkit-transform: translate(0px, -10px) scale(@dropdown-animation-scale);
+			   -moz-transform: translate(0px, -10px) scale(@dropdown-animation-scale);
+			   	-ms-transform: translate(0px, -10px) scale(@dropdown-animation-scale);
+			   		transform: translate(0px, -10px) scale(@dropdown-animation-scale);
+		}
 	}
-	
+
 	&.align-bottomRight { left: -1px; right: auto; }
 	&.align-bottomLeft { right: -1px; left: auto; }
-	
-	
+
+
 	// ARROWS
 	&.align-bottom:before,
 	&.align-bottom:after,
@@ -55,11 +105,11 @@ div.dropdown {
 		position: absolute;
 		top: -7px;
 		left: @dropdown-arrow-offset;
-		width: 0; 
-		height: 0; 
+		width: 0;
+		height: 0;
 		border-left: 8px solid transparent;
 		border-right: 8px solid transparent;
-		
+
 		border-bottom: 8px solid #fff;
 	}
 		// arrow border
@@ -69,26 +119,26 @@ div.dropdown {
 			border-bottom-color: #999;
 			top: -8px;
 		}
-	
+
 	&.align-bottom:before,
 	&.align-bottom:after {
 		left: 50%;
 		margin-left: -8px;
 	}
-	
+
 	&.align-bottomLeft:before,
 	&.align-bottomLeft:after {
 		left: auto;
 		right: @dropdown-arrow-offset;
 	}
-	
+
 	&.align-bottom.style-toolbar:after,
 	&.align-bottomRight.style-toolbar:after,
 	&.align-bottomLeft.style-toolbar:after {
-		border-bottom-color: #f5f5f5;
+		border-bottom-color: #eee;
 	}
-	
-	
+
+
 	// ALIGN TOP ------------------------------------------------------------------------
 	&.align-top,
 	&.align-topLeft,
@@ -96,12 +146,19 @@ div.dropdown {
 		top: auto;
 		bottom: 100%;
 		margin-bottom: 10px;
+		
+		&.animate {
+			-webkit-transform: translate(0px, 10px) scale(@dropdown-animation-scale);
+			   -moz-transform: translate(0px, 10px) scale(@dropdown-animation-scale);
+			   	-ms-transform: translate(0px, 10px) scale(@dropdown-animation-scale);
+			   		transform: translate(0px, 10px) scale(@dropdown-animation-scale);
+		}
 	}
-	
+
 	&.align-topRight { left: -1px; right: auto; }
 	&.align-topLeft { right: -1px; left: auto; }
-	
-	
+
+
 	// ARROWS
 	&.align-top:before,
 	&.align-top:after,
@@ -113,11 +170,11 @@ div.dropdown {
 		position: absolute;
 		bottom: -7px;
 		left: @dropdown-arrow-offset;
-		width: 0; 
-		height: 0; 
+		width: 0;
+		height: 0;
 		border-left: 8px solid transparent;
 		border-right: 8px solid transparent;
-		
+
 		border-top: 8px solid #fff;
 	}
 		// arrow border
@@ -127,26 +184,26 @@ div.dropdown {
 			border-top-color: #999;
 			bottom: -8px;
 		}
-	
+
 	&.align-top:before,
 	&.align-top:after {
 		left: 50%;
 		margin-left: -8px;
 	}
-	
+
 	&.align-topLeft:before,
 	&.align-topLeft:after {
 		left: auto;
 		right: @dropdown-arrow-offset;
 	}
-	
+
 	&.align-topRight.style-toolbar:after,
 	&.align-topLeft.style-toolbar:after {
-		border-top-color: #f5f5f5;
+		border-top-color: #eee;
 	}
-	
-	
-	
+
+
+
 	// ALIGN LEFT ------------------------------------------------------------------------
 	&.align-left,
 	&.align-leftTop,
@@ -155,12 +212,19 @@ div.dropdown {
 		right: 100%;
 		margin-right: 10px;
 		top: -1px;
+		
+		&.animate {
+			-webkit-transform: translate(10px, 0px) scale(@dropdown-animation-scale);
+			   -moz-transform: translate(10px, 0px) scale(@dropdown-animation-scale);
+			   	-ms-transform: translate(10px, 0px) scale(@dropdown-animation-scale);
+			   		transform: translate(10px, 0px) scale(@dropdown-animation-scale);
+		}
 	}
-	
+
 	&.align-leftTop { bottom: -1px; top: auto}
 	&.align-leftBottom { bottom: auto; top: -1px}
-	
-	
+
+
 	// ARROWS
 	&.align-left:before,
 	&.align-left:after,
@@ -172,11 +236,11 @@ div.dropdown {
 		position: absolute;
 		right: -7px;
 		top: @dropdown-arrow-offset;
-		width: 0; 
-		height: 0; 
+		width: 0;
+		height: 0;
 		border-top: 8px solid transparent;
 		border-bottom: 8px solid transparent;
-		
+
 		border-left: 8px solid #fff;
 	}
 		// arrow border
@@ -186,27 +250,27 @@ div.dropdown {
 			border-left-color: #999;
 			right: -8px;
 		}
-	
+
 	// adjust arrow for LEFT
 	&.align-left:before,
 	&.align-left:after {
 		top: 50%;
 		margin-top: -8px;
 	}
-	
+
 	&.align-leftTop:before,
 	&.align-leftTop:after {
 		top: auto;
 		bottom: @dropdown-arrow-offset;
 	}
-	
+
 	&.align-left.style-toolbar:after,
 	&.align-leftTop.style-toolbar:after,
 	&.align-leftBottom.style-toolbar:after {
-		border-left-color: #f5f5f5;
+		border-left-color: #eee;
 	}
-	
-	
+
+
 	// ALIGN RIGHT ------------------------------------------------------------------------
 	&.align-right,
 	&.align-rightTop,
@@ -215,11 +279,18 @@ div.dropdown {
 		left: 100%;
 		margin-left: 10px;
 		top: -1px;
+		
+		&.animate {
+			-webkit-transform: translate(-10px, 0px) scale(@dropdown-animation-scale);
+			   -moz-transform: translate(-10px, 0px) scale(@dropdown-animation-scale);
+			   	-ms-transform: translate(-10px, 0px) scale(@dropdown-animation-scale);
+			   		transform: translate(-10px, 0px) scale(@dropdown-animation-scale);
+		}
 	}
-	
+
 	&.align-rightTop { bottom: -1px; top: auto}
 	&.align-rightBottom { bottom: auto; top: -1px}
-	
+
 	// ARROWS
 	&.align-right:before,
 	&.align-right:after,
@@ -231,11 +302,11 @@ div.dropdown {
 		position: absolute;
 		left: -7px;
 		top: @dropdown-arrow-offset;
-		width: 0; 
-		height: 0; 
+		width: 0;
+		height: 0;
 		border-top: 8px solid transparent;
 		border-bottom: 8px solid transparent;
-		
+
 		border-right: 8px solid #fff;
 	}
 		// arrow border
@@ -245,60 +316,89 @@ div.dropdown {
 			border-right-color: #999;
 			left: -8px;
 		}
-	
+
 	// adjust arrow for LEFT
 	&.align-right:before,
 	&.align-right:after {
 		top: 50%;
 		margin-top: -8px;
 	}
-	
+
 	&.align-rightTop:before,
 	&.align-rightTop:after {
 		top: auto;
 		bottom: @dropdown-arrow-offset;
 	}
-	
+
 	&.align-right.style-toolbar:after,
 	&.align-rightBottom.style-toolbar:after {
-		border-right-color: #f5f5f5;
+		border-right-color: #eee;
+	}
+
+	
+	&.animate.open {
+		opacity: 1;
+		-webkit-transform: translate(0px, 0px) scale(1);
+		   -moz-transform: translate(0px, 0px) scale(1);
+		   	-ms-transform: translate(0px, 0px) scale(1);
+		   		transform: translate(0px, 0px) scale(1);
 	}
 	
-	
+
 	> .padded {
 		padding: 5px !important;
 		.box-sizing();
-		
+
 		.model-editor {
 			margin-bottom: 0;
 		}
-		
+
+		.model-editor.label-style-medium {
+			margin-bottom: .5em !important;
+		}
+
 		.pull-out { margin-left: -5px; margin-right: -5px;}
-		
+
 		.footer {
 			margin: 10px -5px -5px -5px;
-			padding: 5px !important
+			padding: 5px !important;
+			.border-radius(0, 3px, 3px, 0);
+
+			.btn {
+				font-size: 13px;
+				margin-right: .5em;
+			}
+
+			.btn.right {
+				margin-left: .5em;
+				margin-right: 0;
+			}
 		}
 	}
 	
-	
+
+
 /*
 	Default Dropdown View
 */
 	.dropdown-text-view {
 		padding: 7px;
-		
+
 		> p {
 			line-height: 1.2em;
 			margin-bottom: 1em;
 		}
-		
+
+        > *:first-child {
+			margin-top: 0;
+		}
+
 		> *:last-child {
 			margin-bottom: 0;
 		}
 	}
-	
-	
+
+
 /*
 	Menu Dropdown View
 */
@@ -308,170 +408,303 @@ div.dropdown {
 		overflow-y: auto;
 		margin: 0;
 
-		
+
 		> li:not(.divider):not(.label-divider) {
-			padding: 7px;
 			cursor: pointer;
 			word-break: break-all;
-			
-			&:hover,
-			&.dropdown-open {
-				//.dark-hover-state();
-				background: #eee;
-				
-				.cursive { color: #bbb; }
+            min-width: 0;
+			//position: relative; // relative for the "selected" checkmark...will this cause unwanted consequences? idk..
+
+			> span {
+				display: block;
+				padding: .5em;
+				position: relative;
 			}
-			
-			&.icon-trash:hover {
-				//.red-hover-state()
+
+			> span > .description {
+				display: block;
+				font-size: .8em;
+				line-height: 1em;
+				color: #777;
+				padding-right: 10px;
+				word-break: normal;
+			}
+
+			> span > .options {
+				padding: 2px 2px 2px;
+				font-size: .8em;
+				position: absolute;
+				right: .5em;
+				top: 50%;
+				margin-top: -9px;
+				background: #fff;
+				//border: solid 1px #fff;
+				cursor: pointer;
+				opacity: 0;
+				visibility: hidden;
+
+				&:hover {
+					//border-color: #999;
+					background: #ddd;
+				}
+			}
+
+			> span:hover > .options,
+			> span > .options.dropdown-open {
+				opacity: 1;
+				visibility: visible;
+			}
+
+			// show right pointer arrow to inform user of nesting
+			&.has-dropdown > span,
+			&.selected > span {
+				position: relative;
+
+				&:after {
+					content: '\131'; // requires basic buttons (https://github.com/kjantzer/basic-buttons)
+					font-family: "basic-buttons-font";
+					font-style: normal;
+					font-weight: normal;
+					speak: none;
+					display: inline-block;
+					text-decoration: inherit;
+					width: 1em;
+					text-align: center;
+					opacity: .5;
+					font-variant: normal;
+					text-transform: none;
+					line-height: 1em;
+					//float: right;
+					position: absolute;
+					right: .5em;
+					margin-right: -.25em;
+					margin-left: -20px;
+					top: 50%;
+					-webkit-transform: translateY(-50%);
+					   -moz-transform: translateY(-50%);
+							transform: translateY(-50%);
+
+					padding-left: 1px;
+					//padding-top: 2px;
+					z-index: 9;
+					background: #fff;
+				}
+			}
+
+			&.selected { font-weight: bold; }
+			&.selected > span:after { content: '\2713'; opacity: 1; }
+
+			&:hover > span.icon-trash {
 				background: @red;
 				color: #fff;
 			}
-			
-			
+
 			// icon
-			&:before {
+			> span:before {
 				vertical-align: middle;
 				margin-top: -2px;
 				margin-right: 4px;
 			}
-			
+
+
+			&:hover,
+			&.dropdown-open {
+				//.dark-hover-state();
+				background: #eee;
+
+				> span:after { background: #eee; }
+
+				.cursive { color: #bbb; }
+			}
+
 		}
-		
+
 		> li.divider,
 		> li.divider:hover {
 			width: 100% !important;
-			height: 2px !important;
+			height: 0px !important;
 			margin: 1px 0px 1px !important;
-			padding: 0;
+			padding: 1px 0 0 0;
 			overflow: hidden;
 			background: #E5E5E5 !important;
 			border-bottom: 1px solid white;
 			cursor: default;
 		}
-		
+
 		> li.label-divider,
 		> li.label-divider:hover {
 			padding: 2px 5px 2px !important;
 			margin: 1px 0;
+			font-size: .8em;
+            background-color: #e5e5e5;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #777;
 		}
-		
+
 		> li.label-divider:first-child,
 		> li.label-divider:first-child:hover {
 			margin-top: 0;
 		}
-		
+
 		&.with-input {
-				
+
 			input {
 				margin: 0;
 				width: 100%;
 			}
-			
+
 			> li:first-child,
 			> li:first-child:hover {
 				cursor: default;
 				background: #fff !important;
 			}
-			
+
 		}
-		
-		
+
+
 		&.theme-select {
 			padding-top: 2px;
 			padding-bottom: 2px;
-			
+
 			> li:not(.divider):not(.label-divider) {
 				padding: 2px 5px 2px 2px;
-				
+
 				&:hover {
-					background: #f5f5f5;
+					background: #eee;
 					color: @dark;
 					text-shadow: none;
 				}
-				
+
 				// icon
 				&:before { margin-right: 1px; }
 				&:not(:hover):before {visibility: hidden;}
 			}
 		}
-		
-	}
-	
+
+	} // .dropdown-menu-view
+
 	.search-bar + ul.dropdown-menu-view {
 		max-height: @dropdown-max-height - 37;
 	}
-	
+
 	.model-editor + .model-editor:not(.clear) { margin-left: 10px;}
 	.model-editor + .button { margin-left: 10px;}
-	
-	
+
+	&.theme-larger {
+		font-size: 16px;
+	}
+
+	&.theme-right-align {
+		.dropdown-menu-view > li:not(.divider):not(.label-divider) {
+			text-align: right;
+
+			&.has-dropdown > span,
+			&.selected > span {
+				position: relative;
+
+				&:after {
+					content: '\e75d';
+					right: auto;
+					left: .5em;
+					margin-right: -20px;
+					margin-left: -.25em;
+				}
+			}
+		}
+	}
+
+	// compact row of icons
+	&.theme-icons {
+		ul.dropdown-menu-view {
+			.display-flex();
+		}
+	}
+
+	// not used yet, but here for concept
+	&.theme-columns {
+
+		ul.dropdown-menu-view {
+			-webkit-column-width: 120px;
+			-webkit-column-gap: 0;
+
+			//> li:not(.divider):not(.label-divider) {
+			> li {
+				border-right: solid 1px #ddd;
+			}
+
+			> li.label-divider {
+				-webkit-column-break-before: always;
+			}
+		}
+	}
+
 
 /*
 	Search Bar
 */
 	.search-bar {
-		//.gradient(#ddd,#ddd,#f5f5f5);
+		//.gradient(#ddd,#ddd,#eee);
 		background: #eee;
 		padding: 2px 5px;
 		border-bottom: solid 1px #bbb;
 		.box-shadow(#fff 0 1px 0 inset);
 		height: 31px;
 		.border-radius(3px, 0, 0, 3px);
-		
+
 		input {
 			width: 100%;
 		}
-		
+
 		.spin-wrapper {
 			position: absolute;
 			right: 19px;
 			top: 18px;
 		}
-	
+
 	}
- 
- 
+
+
 /*
 	Search Results
 */
 	.search-results {
 		max-height: @dropdown-max-height;
 		overflow-y: auto;
-		
+
 		&:empty {
-			border-bottom: solid 1px #f5f5f5;
+			border-bottom: solid 1px #eee;
 			margin-top: -1px;
 		}
-		
+
 		// non-results message
 		> p {
 			padding: .5em;
 			line-height: 1.5em;
 			text-transform: none;
 		}
-	
+
 		> li {
 			padding: 10px 5px;
 			margin: 1px;
-		
+
 			&.active{
 				//.gradient(#4da0f7, #3671c0, #4da0f7);
 				//background: @dark;
 				background: #eee;
 				//color: #fff;
 				//text-shadow: rgba(0,0,0,.5) 0 1px 0;
-				
+
 				.cursive { color: #bbb; }
 			}
 		}
 	}
-	
+
 	.search-bar + .search-results {
 		max-height: @dropdown-max-height - 36; // 36 is height of search-bar
 	}
-	
-	
+
+
 /*
 	Model Preview View
 */
@@ -487,28 +720,28 @@ div.dropdown {
 		padding: 10px;
 		position: relative;
 	}
-	
-	
+
+
 	.book-preview {
-	
+
 		.is-approved {
 			position: absolute;
 			top: 5px;
 			right: 1px;
 			color: @green;
 		}
-		
+
 		img.preview-artwork {
 			width: 45px;
 			height: 45px;
 			.rounded(4px);
 			float: left;
 		}
-		
+
 		.main-info {
 			margin-left: 55px;
 		}
-		
+
 		.preview-details {
 			font-size: .75em;
 			text-transform: uppercase;
@@ -516,7 +749,7 @@ div.dropdown {
 			font-weight: bold;
 			line-height: 1.3em;
 		}
-		
+
 		.preview-title {
 			font-size: 16px;
 			font-weight: normal;
@@ -524,47 +757,47 @@ div.dropdown {
 			line-height: 1.1em;
 			min-height: 1.1em;
 		}
-		
+
 		.preview-subtitle {
 			font-size: 13px;
 			//font-style: italic;
 			font-weight: normal;
 			min-height: 0;
 		}
-		
+
 		.preview-metadata {
 			color: #999;
 			font-size: .9em;
 		}
-		
-		
+
+
 		.label-divider {
 			margin: 0 -10px 10px;
 			padding: 2px 10px;
 		}
-		
+
 		.products {
 			clear: both;
 			margin: 10px 0;
-			
+
 			.product .isbn {
 				font-size: 1em;
 			}
-			
+
 			.dropdown {
 				margin-left: -1px;
 				margin-bottom: -5px;
 			}
-			
+
 			.product-quickview {
 				height: 90px;
 				overflow-y: auto;
 			}
-			
+
 		}
-		
+
 	}
-	
+
 }
 
 
@@ -572,21 +805,21 @@ div.dropdown {
 
 // !TEMP - move to better location
 .search-results{
-	
+
 	.book-search-result {
-	
+
 		p {
 			color: inherit !important;
 			font-size: 1em !important;
 			margin: 0 !important;
 		}
-	
+
 		.id {
 			font-weight: bold;
 			display: inline-block;
 			width: 35px;
 		}
-		
+
 		.edition {
 			padding-left: 35px;
 			font-size: .8em !important;
@@ -596,5 +829,5 @@ div.dropdown {
 			text-transform: lowercase;
 		}
 	}
-	
+
 }

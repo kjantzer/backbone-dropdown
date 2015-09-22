@@ -1,4 +1,5 @@
 // set some default variables
+@charset "UTF-8";
 
 @red: red;
 @green: green;
@@ -6,11 +7,21 @@
 @serif: 'Times New Roman';
 @sans-serif: 'Helvetica', 'Arial';
 
+@color: #ef5350;
+@color-highlight: #ff998c;
 
-@import 'elements.less'; // http://lesselements.com/
-@import 'lib/kjc-reusable-styles'; // https://gist.github.com/kjantzer/5436097
+@import 'lib/demo-base.less'; // https://gist.github.com/kjantzer/fed29d575814024326cd
 
+@import 'node_modules/basic-buttons/src/basic-buttons.less';
+@font-dir: 'node_modules/basic-buttons/src/fontello/font/';
+
+// Dropdown Style
 @import 'src/dropdown.less';
+
+
+/* ============================
+	DEMO OVERRIDES
+============================ */
 
 // dropdowns require the element to be relative for positioning to work
 .dd {
