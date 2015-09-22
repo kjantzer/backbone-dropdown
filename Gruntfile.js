@@ -17,6 +17,19 @@ module.exports = function(grunt) {
 				}
 			}
 		},
+		
+		uglify: {
+			demo: {
+				src: [
+					'node_modules/jquery/dist/jquery.js',
+					'node_modules/underscore/underscore.js',
+					'node_modules/backbone/backbone.js',
+					'lib/LiquidMetal.js',
+					'src/Dropdown.js'
+				],
+				dest: 'demo-build.js'
+			},
+		},
 			
 		watch: {
 			less: {
@@ -25,10 +38,17 @@ module.exports = function(grunt) {
 				options: {
 					nospawn: true
 				}
+			},
+			js: {
+				files: ['src/**/*.js'],
+				tasks: ['uglify'],
+				options: {
+					nospawn: true
+				}
 			}
 		}
 	});
 
-	grunt.registerTask('default', ['less']);
+	grunt.registerTask('default', ['less', 'uglify']);
 	grunt.registerTask('dev', ['watch']);
 };
