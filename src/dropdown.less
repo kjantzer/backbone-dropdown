@@ -422,6 +422,13 @@ div.dropdown {
 				padding: .5em;
 				position: relative;
 			}
+            
+            &.oneline > span {
+                overflow: hidden;
+            	text-overflow: ellipsis;
+            	white-space: nowrap;
+            	max-width: 100%;
+            }
 
 			> span > .description {
 				display: block;
