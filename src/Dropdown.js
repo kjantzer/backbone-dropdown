@@ -225,7 +225,7 @@ var Dropdown = Backbone.View.extend({
 		// is the given view a function?
 		if( _.isFunction(view) ){
 			this.options.viewFn = this.view.bind(this.options.context||this);	// lets keep a link to this view function
-			this.view = view = this.options.viewFn();// and then run the function to get the view
+			this.view = view = this.options.viewFn(this, this.options);// and then run the function to get the view
 		}
 		
 		// if the given view is a string (or jQuery object), then load that string with a "default dropdown text view"
@@ -508,7 +508,7 @@ var DropdownTextView = Backbone.View.extend({
 
 		// if the view given was a function, call that function on each render for dynamic content
 		if( this.options.viewFn ){
-			this.options.html = this.options.viewFn();
+			this.options.html = this.options.viewFn(this, this.options);
 			this.doRender();
 		}
 	},
@@ -556,7 +556,7 @@ var DropdownMenuView = Backbone.View.extend({
 			this.options.collection = this.options.collection.call(this.context())
 
 		if( this.options.viewFn )
-			this.menu = this.options.viewFn();
+			this.menu = this.options.viewFn(this, this.options);
 		
 		this.$el.addClass('theme-'+this.options.theme)
 		
@@ -591,7 +591,7 @@ var DropdownMenuView = Backbone.View.extend({
 	_render: function(){
 
 		if( this.options.viewFn ){
-			this.menu = this.options.viewFn();
+			this.menu = this.options.viewFn(this, this.options);
 
 			if( !_.isArray(this.menu) ){
 				
