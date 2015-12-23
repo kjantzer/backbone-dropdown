@@ -27,6 +27,23 @@
 
 <header>
     
+    <nav class="menu">
+        <a class="menu-btn" onclick="this.parentNode.classList.toggle('open')"><img src="lib/list.png"></a>
+        <ul id="menu"></ul>
+    </nav>
+    <script>
+    $.getJSON('https://gist.githubusercontent.com/kjantzer/9abbb6cc17d1b6699221/raw', function(menu){
+        var $menu = $('#menu');
+        $.each(menu, function(indx, m){
+            console.log(m);
+            $menu.append('<li>\
+                <a href="http://kjantzer.github.io/'+m.key+'">'+m.label+'</a>\
+                <div class="description">'+(m.description||'')+'</div>\
+                </li>')
+        })
+    })
+    </script>
+    
     <h1>
         Dropdown
     </h1>
