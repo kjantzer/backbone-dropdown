@@ -16,9 +16,10 @@
 </script>
 
 <!-- demo styles which imports dropdown styles -->
-<link href="style.css" rel="stylesheet" type="text/css">
+<link href="./style.less" rel="stylesheet" type="text/css">
 
-<script src="demo-build.js"></script>
+<script src="./index.js"></script>
+
 </head>
 
 <body>
@@ -26,75 +27,62 @@
 <a href="https://github.com/kjantzer/backbonejs-dropdown-view" class="github-corner"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#fff; color:#ef5350; position: absolute; top: 0; border: 0; right: 0;"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
 
 <header>
-    
+
     <nav class="menu">
-        <a class="menu-btn" onclick="this.parentNode.classList.toggle('open')"><img src="lib/list.png"></a>
+        <a class="menu-btn" onclick="this.parentNode.classList.toggle('open')"><img src="./list.png"></a>
         <ul id="menu"></ul>
     </nav>
     <script>
     $.getJSON('https://gist.githubusercontent.com/kjantzer/9abbb6cc17d1b6699221/raw', function(menu){
         var $menu = $('#menu');
         $.each(menu, function(indx, m){
-            console.log(m);
-            $menu.append('<li>\
-                <a href="http://kjantzer.github.io/'+m.key+'">'+m.label+'</a>\
-                <div class="description">'+(m.description||'')+'</div>\
-                </li>')
+            $menu.append('<li><a href="http://kjantzer.github.io/'+m.key+'">'+m.label+
+                '<div class="description">'+(m.description||'')+'</div>'+
+                '</a></li>')
         })
     })
     </script>
-    
+
     <h1>
         Dropdown
     </h1>
-    
+
     <h3>
         Easily create dropdown views for menus, inline editing, or just a simple tooltip.
     </h3>
-    
+
     <p style="text-align:center">
-        <a id="header-demo" class="button dd">Click Me</a>
+        <a id="header-demo" class="button dd">Open Menu</a>
     </p>
-    
-    <script>
-    $('#header-demo').dropdown([
-        { label:'Edit'},
-        { label:'View Options', dropdown: {
-            view: ['Option 1', 'Option 2'],
-            w: 120,
-            align: 'rightBottom'
-        }},
-        'divider',
-        { label:'Delete', }
-    ], {
-        w:160,
-        align: 'bottom',
-    })</script>
-    
+
 </header>
 
 <section>
 
     <h1>Overview</h1>
-    
-    <p><b>Version 1.0.0</b></p>
-    
+
+    <p><b>Version 2.0.0</b></p>
+
     <p>Dropdown is designed to be robust and extensible. It can be used independently or embedded into another plugin such as <a href="https://github.com/kjantzer/backbone-list-controller">List Controller</a>.</p>
-    
+
     <p>The general idea is to display a view inline with the target element. A <code>Backbone.View</code>, <code>jQuery/HTML String</code>, or <code>Array</code> are all acceptable types of "views". An array will be converted into a <code>DropdownMenuView</code>.</p>
-    
+
     <hr>
-    
+    <h1>Install</h1>
+    <p><code>npm install backbone-dropdown</code></p>
+
+    <hr>
+
     <h1>General Use</h1>
-    
+
     <p><b>Vanilla</b></p>
 <pre>
 new Dropdown({
-    
+
     // required
     renderTo: $("#my-button"),
-    view: null,
-    
+    view: myBackboneView,
+
     // options
     w: 200,
     trigger: 'click',
@@ -107,20 +95,20 @@ new Dropdown({
 </pre>
 
     <p><b>jQuery</b></p>
-    
+
 <pre>
 // jQuery
 $("#my-button").dropdown(view, opts);
 </pre>
-    
+
     <hr>
-    
+
     <h1>Menu <code>Array</code></h1>
-    
+
     <p>This is the most powerful view in Dropdown with many different features such as nesting, dividers, filtering, icons, multiple action events, and more. See the options documentation for details.</p>
-    
+
     <p><a id="menu-btn" class="button button-default dd">Open Menu</a></p>
-    
+
     <script>
     $('#menu-btn').dropdown([
         { divider: 'My Menu'},
@@ -137,7 +125,7 @@ $("#my-button").dropdown(view, opts);
         }
     })
     </script>
-    
+
 <pre>
 $('#menu').dropdown([
     { divider: 'My Menu'},
@@ -154,38 +142,38 @@ $('#menu').dropdown([
     }
 })
 </pre>
-        
+
         <hr>
-        
+
         <h1>Backbone View <code>Backbone.View</code></h1>
-        
+
         <p>Dropdown can be used as a thin display wrapper for any Backbone view. Once the view has been initialized, pass it to dropdown as the <code>view</code></p>
-        
+
         <p><a id="myaccount" class="button dd">My Account</a></p>
-        
+
         <script>
         var MyAccount = Backbone.View.extend({
-    		
-    		attributes:{style: 'padding: .5em 1em;'},
-    		
-    		render: function(){
-    			this.$el.html('<h2>My Account</h2><p>This is a backbone view loaded inside of a dropdown.<br><br><a class="dd">Click here</a> to see a nested dropdown view</p>');
-    			this.$('a').dropdown("A nested dropdown. You can have multiple nested dropdowns. But dont't get too crazy or your users may not be very happy ;)");
-    			
-    			return this;
-    		}
-    	}) 
-    	
-    	var myAccount = new MyAccount();
-    	
-    	$('#myaccount').dropdown(myAccount, {w: 300})
+
+		attributes:{style: 'padding: .5em 1em;'},
+
+		render: function(){
+			this.$el.html('<h2>My Account</h2><p>This is a backbone view loaded inside of a dropdown.<br><br><a class="dd">Click here</a> to see a nested dropdown view</p>');
+			this.$('a').dropdown("A nested dropdown. You can have multiple nested dropdowns. But dont't get too crazy or your users may not be very happy ;)");
+
+			return this;
+		}
+	})
+
+	var myAccount = new MyAccount();
+
+	$('#myaccount').dropdown(myAccount, {w: 300})
         </script>
-        
+
 <pre><xmp>
 var MyAccount = Backbone.View.extend({
-    
+
     attributes:{style: 'padding: .5em 1em;'},
-    
+
     render: function(){
         this.$el.html('<h2>My Account</h2><p>This is a backbone view loaded inside of a dropdown.<br><br>
             <a class="dd">Click here</a> to see a nested dropdown view</p>');
@@ -193,7 +181,7 @@ var MyAccount = Backbone.View.extend({
         But dont't get too crazy or your users may not be very happy ;)");
         return this;
     }
-}) 
+})
 
 var myAccount = new MyAccount();
 
@@ -202,69 +190,69 @@ $('#myaccount').dropdown(myAccount, {w: 300})
 
     <br>
     <p>Each time the dropdown is opened, <code>myAccount.render()</code> will be called.</p>
-        
-        
-    
+
+
+
     <hr>
-    
+
     <h1>Text Tooltip <code>String/jQuery</code></h1>
-    
+
     <p>Dropdown can also be used as a simple <a id="simple-tooltip" class="dd">tooltip</a>.</p>
-    
+
     <script>
     $('#simple-tooltip').dropdown('This is a tooltip', {
-        align: 'topRight', 
+        align: 'topRight',
         trigger: 'hover'
     });
     </script>
-    
+
 <pre>
 $('#simple-tooltip').dropdown('This is a tooltip', {
-    align: 'topRight', 
+    align: 'topRight',
     trigger: 'hover'
 });
 </pre>
 
     <br>
     <p>This <a id="simple-tooltip-dynamic" class="dd">tooltip</a> will be dynamically generated each time it opens.</p>
-    
+
     <script>
     $('#simple-tooltip-dynamic').dropdown(function(){
         return 'This is dynamic: '+(new Date).toString();
     }, {
-        align: 'topRight', 
+        align: 'topRight',
         w: 500,
         trigger: 'hover'
     });
     </script>
-    
+
 <pre>
 $('#simple-tooltip-dynamic').dropdown(function(){
     return 'This is dynamic: '+(new Date).toString();
 }, {
     align: 'top',
-    w: 220, 
+    w: 220,
     trigger: 'hover'
 });
 </pre>
 
     <hr>
-    
+
     <h1>Options</h1>
 
-    <p>Soon.</p>
+    <p>Checkout <code>demo/index.js</code></p>
 
     <hr>
-    
+
     <h1>License</h1>
-    
+
     <p>MIT © <a href="http://kevinjantzer.com">Kevin Jantzer</a></p>
 
 
     <hr>
-    
+
     <small>Built by <a href="http://kevinjantzer.com">Kevin Jantzer</a>, <a href="http://blackstoneaudio.com">Blackstone Audio Inc.</a></small>
-    
+
 </section>
 
 </body>
