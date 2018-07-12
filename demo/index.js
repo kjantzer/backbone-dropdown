@@ -1,7 +1,6 @@
 
 window.jQuery = window.$ = require('jquery')
 window._ = require('underscore')
-_.mixin( require('underscore.string').exports() );
 window.Backbone = require('backbone')
 Backbone.$ = jQuery
 
